@@ -156,7 +156,7 @@ int main() {
 	}
 	// ***** WHY NOT INITIALISE WEALTH OF ALL AGENTS TO BE 1 !?  --> DON'T RENORMALIZE! ***** //
 	// Renormalise wealth w[]
-	renormalizearray(w,cons.N);
+	//renormalizearray(w,cons.N);
 
 	// Now I fill up the output files at t=0
 	printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons);	// Print time, gini coefficient, efficiency 

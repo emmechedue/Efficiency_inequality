@@ -184,7 +184,7 @@ int main() {
 			oldt = cons.T - t; 			// Note that here oldt has a different use, 
 								// I'm simply using this variable since I don't need it anymore
 
-			// Calculate how many printing intervals were there bitween the last timestep and the final timestep
+			// Calculate how many printing intervals were there between the last timestep and the final timestep
 			enne = floor(oldt / cons.interval);
 
 			// Print the output (time, Gini coefficient, efficiency and all the wealth)
@@ -192,18 +192,18 @@ int main() {
 			for (i = 1; i < (enne + 1); i++) { 
 
 				// Note that here I have "<" of (enne + 1) and not "<=", since here I need the time explicitely!
-				// The (enne + 1) is because I need it to multply. Meaning that all this is because I start from 1. 
+				// The (enne + 1) is because I need it to multiply. Meaning that all this is because I start from 1. 
 				// And I have to do it since I still have to update the time t.
 
 				// Print time, Gini coefficient, efficiency and all the wealth for the (t + i*cinst.interval) timestep 
 				printstuffsingleloop(filet, filew, filec, t + i * cons.interval, eff, w,alpha, cons); 
-				// RESET the counter for the AVERAGE of the EFFICIENTCY					
+				// RESET the counter for the AVERAGE of the EFFICIENCY					
 				counteff = -1; 
 			}
 			
 			// Print the output (time, Gini coefficient, efficiency and all the wealth) for the last timestep (at time T)
 			printstuffsingleloop(filet, filew,filec, cons.T, eff, w, alpha, cons);
-			// RESET the counter for the AVERAGE of the EFFICIENTCY	 
+			// RESET the counter for the AVERAGE of the EFFICIENCY	 
 			counteff = -1; 
 			
 			// EXIT from the DO LOOP !
@@ -215,7 +215,7 @@ int main() {
 		// reprint the old situation before updating the system!!
 		if (ranvar > cons.interval) { 
 	
-			// Calculate how many printing intervals were there bitween the last timestep and the new timestep
+			// Calculate how many printing intervals were there between the last timestep and the new timestep
 			enne = floor(ranvar / cons.interval);
 
 			// Print the output (time, Gini coefficient, efficiency and all the wealth)
@@ -226,7 +226,7 @@ int main() {
 
 				// Print time, Gini coefficient, efficiency and all the wealth for each if the printout intervals 
 				printstuffsingleloop(filet, filew,filec, t + i * cons.interval, eff, w, alpha, cons); 
-				// RESET the counter for the AVERAGE of the EFFICIENTCY
+				// RESET the counter for the AVERAGE of the EFFICIENCY
 				counteff = -1; 
 
 				// Print the time to commandline for checking the runtime. 
@@ -243,7 +243,7 @@ int main() {
 		// Update oldt.
 		oldt = oldt + ranvar; 
 
-		// *** Update the stragedy of a random agent *** //
+		// *** Update the strategy of a random agent *** //
 
 		// Randomly select an agent (uniformly distributed RNG)
 		k=gsl_rng_uniform_int(gslpointer,cons.N);
