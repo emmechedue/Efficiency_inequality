@@ -58,6 +58,7 @@ int main() {
 	double ranvar;		// A random variable
 	double eff, oldeff;	// These are to print the efficiency and then renormalize the wealth. 
 				// Here the efficiency is defined as percentage growth
+	double wealth, oldwealth; //Wealth is the wealth at every time step. Oldwealth is a support variable I need to compute the efficiency
 	int counteff;		// This I need to make proper averages of the efficiency
 
 	// ofstream for outputing and output files
@@ -141,10 +142,11 @@ int main() {
 	for(i=0;i<cons.N;i++){
 	
 		// ***** WHY NOT INITIALISE WEALTH OF ALL AGENTS TO BE 1 !? ***** //
+		// Because we can be interested in studying a distribution of wealth
 		// Initial wealth W0 is equal for all
-    		//w[i]=cons.W0;		
-		w[i] = 1.0;		
-		
+    	w[i]=cons.W0;		
+		wealth=cons.N*cons.W0; //Total initial wealth. I don't really need to initialize this, but it's better anyway
+		oldwealth=wealth; //It is important to initialize this!
 		// Intial rank is efectivly random
     		rank[i]=i;		
 		
@@ -260,9 +262,11 @@ int main() {
 		// Here I use the ranking to generate the groups and update the wealth of the players.
 		formgroups(w, alpha, O,rank, cons, M); 
 
-		// Here I compute the total amount of wealth. Since the total wealth was normalized to one before,
-		// this is the increase in percentage of wealth.
-		eff = sumofvector(w, cons.N) - 1. ; 
+		// Here I compute the total amount of wealth. And the efficiency, which is defined as the percentage increase of wealth.
+		wealth = sumofvector(w, cons.N);
+		eff = wealth - oldwealth;
+		eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
+		oldwealth = wealth;		 
 
 		// These 3 lines here are to compute proper averages of eff. 
 		// This is in case I perform many iterations without printing.

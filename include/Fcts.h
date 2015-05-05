@@ -235,9 +235,9 @@ double logitprob(double beta, double util){
     double out;
 
 	//out = exp(beta * util);
-	cout << "Usual exp(" << beta << "*" << util << "): " << exp(beta * util) << endl; 	
+	//cout << "Usual exp(" << beta << "*" << util << "): " << exp(beta * util) << endl; 	
 	out = double(mpEXPcpp(beta*util));
-	cout << "mpEXP exp(" << beta << "*" << util << "): " << out << endl;
+	//cout << "mpEXP exp(" << beta << "*" << util << "): " << out << endl;
     
     return out;
 }
@@ -248,7 +248,7 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"N= "<<cons.N<<endl<<endl;
 	filec<<"#Time at which I stop the simulation:"<<endl;
 	filec<<"T= "<<cons.T<<endl<<endl;
-        filec<<"#Time interval to print my data:"<<endl;
+    filec<<"#Time interval to print my data:"<<endl;
 	filec<<"interval= "<<cons.interval<<endl<<endl;
 	filec<<"#Size of the groups:"<<endl;
 	filec<<"S= "<<cons.S<<endl<<endl;
@@ -264,9 +264,9 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"W0= "<<cons.W0<<endl<<endl;
 	filec<<"#Number that indicates the choice of what are we using to rank agents in the groups:"<<endl;
 	filec<<"Choice= "<<cons.Choice<<endl<<endl;
-        filec<<"#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
-        filec<<"monincr= "<<cons.monincr<<endl<<endl;
-        filec<<"#This is the noise parameter in the logit:"<<endl;
+	filec<<"#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
+	filec<<"monincr= "<<cons.monincr<<endl<<endl;
+	filec<<"#This is the noise parameter in the logit:"<<endl;
 	filec<<"beta= "<<cons.beta<<endl<<endl;
 	return;
 }
@@ -450,8 +450,8 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     return ;
 }
 
-/*This function takes an old average and updates it to the new average based on i
- i is the number of event I had to average before (so minus the one I'm averaging now)
+/*This function takes an old average and updates it to the new average based on i. 
+i is the number of event I had to average before (so minus the one I'm averaging now).
  Hence if it is the first time I'm computing the average, i=0.*/
 double updateaverages(double oldval, double newval, int i){
     double res;
