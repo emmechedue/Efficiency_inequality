@@ -123,7 +123,6 @@ int main() {
 
 
 	// *********** Initialise description of agents and groups (START GENERATING ALL THE STUFF) *********** //
-	
 
 	// Check that number of agents N is exactly divisible by size of groups S 
 	if((cons.N%cons.S) != 0){ 
