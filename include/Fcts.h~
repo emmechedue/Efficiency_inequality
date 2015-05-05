@@ -235,9 +235,9 @@ double logitprob(double beta, double util){
     double out;
 
 	//out = exp(beta * util);
-	cout << "Usual exp(" << beta << "*" << util << "): " << exp(beta * util) << endl; 	
+	//cout << "Usual exp(" << beta << "*" << util << "): " << exp(beta * util) << endl; 	
 	out = double(mpEXPcpp(beta*util));
-	cout << "mpEXP exp(" << beta << "*" << util << "): " << out << endl;
+	//cout << "mpEXP exp(" << beta << "*" << util << "): " << out << endl;
     
     return out;
 }

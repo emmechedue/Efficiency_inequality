@@ -419,7 +419,7 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
 
         //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
         probarr[i] = mpEXPcpp(cons.beta*utility);
-	cout << "mpEXP exp(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
+		//cout << "mpEXP exp(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
         sum = sum + probarr[i];
         
         oldutility=utility;
