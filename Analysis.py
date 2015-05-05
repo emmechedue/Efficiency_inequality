@@ -92,14 +92,15 @@ plt.plot(data1[0], data1[2])
 plt.plot(data1[0], data2[2])
 plt.plot(data1[0], data3[2])
 plt.plot(data1[0], data4[2])
-plt.title("Relative growth for different ranking systems")
+plt.title("Total wealth (?) for different ranking systems")
 legend1=r'$\alpha_i  w_i  r_i = O_i$'
 legend2=r'$\alpha_i  w_i$'
 legend3=r'$\alpha_i  r_i$'
 legend4=r'$\alpha_i$'
 plt.legend((legend1,legend2,legend3,legend4),loc=4)
 plt.xlabel('time')
-plt.ylabel(r'Relative Growth, $\left(w[t]-w[t-1]\right)/w[t-1]$')
+#plt.ylabel(r'Relative Growth, $\left(w[t]-w[t-1]\right)/w[t-1]$')
+plt.ylabel(r'Total wealth')
 plt.tight_layout()
 plt.savefig('growth.pdf',dpi=100)
 close()
