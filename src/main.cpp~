@@ -266,8 +266,7 @@ int main() {
 		wealth = sumofvector(w, cons.N);
 		eff = wealth - oldwealth;
 		eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
-		oldwealth = wealth;
-		 
+		oldwealth = wealth;		 
 
 		// These 3 lines here are to compute proper averages of eff. 
 		// This is in case I perform many iterations without printing.
