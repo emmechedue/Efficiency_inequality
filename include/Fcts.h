@@ -392,10 +392,12 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     double dummyO[cons.N]; //The dummy vector of outputs
     int M = cons.N/cons.S; //I already check in the main that I can do that
     //double probarr[p]; //the array with the probabilities;
-    cpp_dec_float_100 probarr[p]; //the array with the probabilities;
+	// myMP_float is the custom multiprecision float defined in mpEXP.h
+    myMP_float probarr[p]; //the array with the probabilities;
     vector<double> cumprob (p,0); //The array with the cumulative probabilities
     //double sum; //dummy variable
-    cpp_dec_float_100 sum; //dummy variable
+	// myMP_float is the custom multiprecision float defined in mpEXP.h
+    myMP_float sum; //dummy variable
     double tmp_var;
     
     for(i=0; i<cons.N ; i++){ //Here I copy the vector of strategy into this fake one. Note that I don't directly pass the pointer because I want to manipulate this one. Hence I have to copy all the array
@@ -419,7 +421,7 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
 
         //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
         probarr[i] = mpEXPcpp(cons.beta*utility);
-		//cout << "mpEXP exp(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
+	cout << "mpEXP exp(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
         sum = sum + probarr[i];
         
         oldutility=utility;

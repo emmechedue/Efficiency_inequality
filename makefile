@@ -7,8 +7,8 @@ CXX=g++
 LDFLAGS = -lgsl -lgslcblas
 
 # Flag for your Boost 
-#BOOST=/usr/local/boost_1_58_0
-BOOST=/usr/include/boost
+BOOST=/usr/local/boost_1_58_0
+#BOOST=/usr/include/boost
 
 # Flags for include folder (header files)
 INCFLAGS = -Iinclude -I$(BOOST)

@@ -6,16 +6,18 @@
 // For convinience use boost::multiprecision as namespace
 using namespace boost::multiprecision;
 
+// *** MAKE CUSTOM MULTIPRECISION TYPE *** // 
+typedef number<cpp_dec_float<256, long long> > myMP_float;
 
 // mpEXPcpp - Exponent function using Boost::multiprecision cpp_dec_float 
 
-cpp_dec_float_100 mpEXPcpp(double x){
-	cpp_dec_float_100 tmpX = cpp_dec_float_100(x);
+myMP_float mpEXPcpp(double x){
+	myMP_float tmpX = myMP_float(x);
 	
 	return boost::multiprecision::exp(tmpX); 
 }
 
-
+/*
 // Multiprecision (cpp_dec_float) method for calculating probability 
 // S - utility array; N - lenght of S; beta - parameter beta;
 // i - index of the utility for which we wish to calulate the probability
@@ -53,3 +55,5 @@ double mpPRcppDB(double S[], int N, int i, double beta){
 	return double(tmp);
 	
 }
+
+*/
