@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+
+\author{Stefano Duca}
+\title{General notes on the model}
+
+\begin{document}
+
+\maketitle
+
+\section*{Notes on the code and definition of functions}
+\textbf{General notes on the functioning of the program:}
+
+\begin{itemize}
+
+\item In the function I have to keep renormalizing the wealth all the time because otherwise the number were too big or too small and the computer was going nuts.
+
+To still print the efficiency I have to compute it at every time step. Right after that I renormalize the wealth array.
+
+To take into account the fact that I might do many iterations before I actually print I have to keep track of how many times I am iterating without printing and update the average of the efficiency.
+
+Hence with this program I'm measuring the efficiency as increase (or decrease) in percentage of the total wealth after taking part at one round of the game.
+The output is then the average efficiency over the period of time between the 2 prints.
+
+\end{itemize}
+
+
+\textbf{In the Fcts.h header:}
+
+\subsection*{updatestrategy}
+This function checks what the utility would be for each of the strategies that we allow to k and then samples a choice from a logit distribution.
+The function used to sample the strategy is:
+$$ p_{i}\left(s_{i},s_{-i}\right)=\frac{e^{\beta u_{i}\left(s_{i},s_{-i}\right)}}{\sum_{s_{i}^{'}\in S_{i}}e^{\beta u_{i}\left(s_{i}^{'},s_{-i}\right)}} $$
+as eq. (1) from the paper \textit{The logit-response dynamics}.
+
+
+In the second \textbf{for} cycle, when the function is computing the various utilities, if the ranking with this strategy would be the same before, instead of computing the utility by creating the groups, I compute the new utility from the old utility in this way:
+$$
+u_{t}=u_{t-1}+\textrm{lenghtofinterval} *w_{i}\left(Qr_{i}-1\right) 
+$$
+where t is the index for the current strategy and lenghtofinterval is the difference in contribution between the current and the previous strategy.
+This is because
+\begin{align*}
+u_{t-1} &=& w\left(1-\alpha_{t-1}\right)+\sum_{j\neq i\:,\: j\in S_{i}}QO_{j}
++\alpha_{t-1}Qrw &\Rightarrow& \\
+&=& w+\sum_{j\neq i\:,\: j\in S_{i}}QO_{j}+\alpha_{t-1}w\left(Qr-1\right)
+ & & \\
+u_{t} &=& w\left(1-\alpha_{t}\right)+\sum_{j\neq i\:,\: j\in S_{i}}QO_{j}
++\alpha_{t}Qrw &\Rightarrow& \\
+u_{t} &=& u_{t-1}+\left(\alpha_{t}-\alpha_{t-1}\right)w\left(Qr-1\right) &&
+\end{align*}
+
+%\begin{align*}
+%\textrm{Group efficiency:} X=\left(\sum x_{i}^{\frac{1}{\alpha}}\right)^{\alpha} \\
+%\alpha = \textrm{Collaborative ability}\\
+%\alpha\ll1\Rightarrow X\approxeq max\left(x_{i}\right) \\
+%\alpha=1\Rightarrow \textrm{linear} \\
+%x=x_{i}\Rightarrow X=n^{\alpha}x \\
+%\textrm{(Lanchester-Osipov model)}
+%\end{align*}
+
+\end{document}
