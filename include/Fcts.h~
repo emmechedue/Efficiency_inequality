@@ -153,6 +153,26 @@ void renormalizearray(double *w, int N){
     return ;
 }
 
+// Renaormalize array of myMP_float
+
+/*This function renormalizes an array of size N such that its sum amounts to 1*/
+void renormalizearray(myMP_float *w, int N){
+    myMP_float sum = 0.0;
+    int i;
+    
+    //Let's compute the total sum of the array
+    for(int i=0;i<N;i++){
+        sum = sum + w[i];
+    }
+ 
+    // Now let's renormalize
+    for(i=0;i<N;i++){
+        w[i] = w[i]/sum;
+    }
+    
+    return ;
+}
+
 double computeaverage(double *vec, int n){ //This function computes the non-weighted average of a vector vec of length n
     int i;
     double res;
@@ -314,9 +334,12 @@ int inverserank(int k, int *rank, Constants cons){
 
 /* This function here will calculate the utility that agent k would get from his group
  It is different from formgroups because here I just compute the utlity for the q-th agent*/
-double getutility(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
+
+// *** Make new function with myMP_float *** // 
+
+myMP_float getutility(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
 	int j,k; //i and j are dummy variables, k needs to be updated by hand and will be used for the rank
-	double gain, utility; //The gain in the group and the utlity of q
+	myMP_float gain, utility; //The gain in the group and the utlity of q
         int g; //The group in which q is
         int place; //The rank of q
         
@@ -326,6 +349,33 @@ double getutility(int q, double *w, double *alpha, double *O, int *rank, Constan
         g = place/cons.S;
         
         /*Then I skip directly to that group and compute the gain in that group*/
+        k=cons.S * g; //I start from the k-th ranked agent
+        gain=0.0; //Set the gain of the group to 0.
+	
+        for(j=0;j<cons.S;j++){
+            gain = gain + O[rank[k+j]]; //Here I am adding to the common pool the contribution due to rank[k+j]. Due to how the systyem is designed, one of those people is q
+	}
+		
+	gain = gain*cons.Q; //Correct for the return rate
+		
+        utility = w[q]*(1.-alpha[q]) + gain; //This is the utility	
+	
+	return utility;
+}
+
+/*
+double getutility(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
+	int j,k; //i and j are dummy variables, k needs to be updated by hand and will be used for the rank
+	double gain, utility; //The gain in the group and the utlity of q
+        int g; //The group in which q is
+        int place; //The rank of q
+        
+        //  As first thing we have to compute what is the ranking of 
+        place=inverserank(q,rank,cons);
+        // As second thing we have to compute in which group the q-th agent is ending up
+        g = place/cons.S;
+        
+        // Then I skip directly to that group and compute the gain in that group
         k=cons.S * g; //I start from the k-th ranked agent
         gain=0; //Set the gain of the group to 0.
 	
@@ -339,6 +389,9 @@ double getutility(int q, double *w, double *alpha, double *O, int *rank, Constan
 	
 	return utility;
 }
+
+*/
+
 //******************************************************************************************************
 
 int binaryprobsearch(double *Gamma, int M, double x) { //Binary search. Gamma is the array of cumulative prob. M is the lenght of the array and x is the random number between zero and one
@@ -383,7 +436,12 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     
     int p= cons.monincr + 1; //Number of strategies available to k
     double lenghtofinterval= 1./cons.monincr ; //Lenght of the interval in which I divide the interval [0,1]
-    double utility, oldutility; //they contain the possible utility for player k for a strategy and the previous one
+    //double utility, oldutility; //they contain the possible utility for player k for a strategy and the previous one
+    //double oldutility; //they contain the possible utility for player k for a strategy and the previous one
+    //double utility[p]; // Utility array
+    myMP_float oldutility; //they contain the possible utility for player k for a strategy and the previous one
+    myMP_float utility[p]; // Utility array
+
     double dummyalpha[cons.N]; //A dummy vector where I copy all the strategies of the other players and then I update the one of player k
     int oldplace=0; //Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative for the first time it checks the if
     int place; //To store the ranking of the k-th agent
@@ -396,7 +454,8 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     myMP_float probarr[p]; //the array with the probabilities;
     vector<double> cumprob (p,0); //The array with the cumulative probabilities
     //double sum; //dummy variable
-    cpp_dec_float_100 sum; //dummy variable
+	// myMP_float is the custom multiprecision float defined in mpEXP.h
+    myMP_float sum; //dummy variable
     double tmp_var;
     
     for(i=0; i<cons.N ; i++){ //Here I copy the vector of strategy into this fake one. Note that I don't directly pass the pointer because I want to manipulate this one. Hence I have to copy all the array
@@ -407,6 +466,38 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     
     /************* This is the loop over all the possible strategies for player k *****************
      * Here I also compute the probability of a certain strategy */
+
+// ***** I MAKE A NEW LOOP HERE: 1) Calculste the array of utilites; 2) normalize it; 3) Calculate the array of probabilites.
+
+// *** Array of Utilities *** //
+    for(i=0; i < p ; i++){
+        dummyalpha[k]  = i*lenghtofinterval; //Set the strategy of k 
+        makeorder(r,w,dummyalpha,dummyrank,cons,dummyO); //Make the rankings
+        place=inverserank(k,dummyrank,cons); //The position where k is placed
+        if(place==oldplace){ //If the rank of k is the same, I don't have to reform the groups. I just update the utility
+            utility[i] = oldutility + lenghtofinterval * w[k] * (cons.Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number
+        }
+        else{ //In this other case I actually have to reform the group
+            utility [i] = getutility(k, w, dummyalpha, dummyO, dummyrank, cons, M); //Actually form the group and compute the utility
+        }
+
+	        
+        oldutility=utility[i];
+        oldplace=place;
+}
+
+// *** Normalize the Utilities array *** //
+renormalizearray(utility,p);
+
+// *** Now calcualte the probability array *** //
+   for(i=0; i < p ; i++){
+        //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
+        probarr[i] = mpEXPcpp(cons.beta*utility[i]);
+	cout << "mpEXP exp(" << cons.beta << "*" << utility[i] << "): " << probarr[i] << endl;
+        sum = sum + probarr[i];
+    }
+
+	/*
     for(i=0; i < p ; i++){
         dummyalpha[k]  = i*lenghtofinterval; //Set the strategy of k 
         makeorder(r,w,dummyalpha,dummyrank,cons,dummyO); //Make the rankings
@@ -427,6 +518,8 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
         oldplace=place;
     }
     
+	*/
+
     /*Now let's renormalize the probabilities and create the array of cumulative probabilities*/
     
     probarr[0] =  probarr[0]/sum;

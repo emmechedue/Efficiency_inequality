@@ -16,7 +16,7 @@ INCFLAGS = -Iinclude -I$(BOOST)
 # Set default compiler parameters
 # -Wall 	shows all warnings when compiling, always use this!
 # -std=c++11 	enables the C++11 standard mode
-CXXFLAGS = -Wall -std=c++11 $(LDFLAGS) $(INCFLAGS) 
+CXXFLAGS = -Wall -std=c++11  $(LDFLAGS) $(INCFLAGS) 
 
 
 
