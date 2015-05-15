@@ -4,8 +4,6 @@
 CXX=g++
 
 # Flags for the libraries etc.
-# gsl for the RNG
-# gmp for multiprecision nr. 
 LDFLAGS = -lgsl -lgslcblas -lgmp -lgmpxx 
 
 # Flag for your Boost 

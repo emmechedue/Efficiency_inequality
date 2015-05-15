@@ -13,20 +13,15 @@
 #endif	/* FCTS_H */
 
 #pragma once
-
-// Standard C++ library includes 
 #include<cstdio>
 #include<cstdlib>
 #include<fstream>
 #include<cmath>
+#include "Constants.h"
 #include<iomanip>
 #include <algorithm>    
 #include <vector>       
 #include <new> 
-
-// My includes
-#include "Constants.h"
-#include "mpEXP.h" 
 
 
 using namespace std;
@@ -228,7 +223,6 @@ double computegini(double *w, Constants cons){
 	return G;
 }
 
-// ***** EFFECTIVLY NOT USING THIS ***** //
 /*This function here just compute the logit probability as the one in eq. one of "The Logit response dynamics" paper*/
 double logitprob(double beta, double util){
     double out;
@@ -238,9 +232,6 @@ cout << "usual exp(" << beta << "*" << util << "): " << out << endl;
     
     return out;
 }
-// ************************************* //
-
-
 
 /************************* Function that prints all the parameters in a file **************************************/
 void printparamsingleloop(ofstream& filec, Constants cons){
@@ -391,16 +382,10 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     int dummyrank[cons.N]; //The vector that will do all the ranking
     double dummyO[cons.N]; //The dummy vector of outputs
     int M = cons.N/cons.S; //I already check in the main that I can do that
-    //double probarr[p]; //the array with the probabilities;
-    //double sum; //dummy variable
-	vector<double> cumprob (p,0); //The array with the cumulative probabilities
-
-	// ***** FOR probarr[] and sum I'm going to use myMP_float from myEXP.h ****** //
-	myMP_float probarr[p];
-	myMP_float sum;
+    double probarr[p]; //the array with the probabilities;
+    vector<double> cumprob (p,0); //The array with the cumulative probabilities
+    double sum; //dummy variable
     
-
-
     for(i=0; i<cons.N ; i++){ //Here I copy the vector of strategy into this fake one. Note that I don't directly pass the pointer because I want to manipulate this one. Hence I have to copy all the array
         dummyalpha[i]=alpha[i];
     }
@@ -420,15 +405,8 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
             utility=getutility(k, w, dummyalpha, dummyO, dummyrank, cons, M); //Actually form the group and compute the utility
         }
         
-	
-        //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
-	
-	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
-	probarr[i] = mpEXP(cons.beta*utility);
+        probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
         sum = sum + probarr[i];
-
-	// ***** Now print the exponent for control ***** //
-	cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
         
         oldutility=utility;
         oldplace=place;
@@ -437,27 +415,15 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     /*Now let's renormalize the probabilities and create the array of cumulative probabilities*/
     
     probarr[0] =  probarr[0]/sum;
-
-	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
-    //cumprob[0] =  probarr[0]; //I have to do the first by end.
-	cumprob[0] =  double(probarr[0]); //I have to do the first by end.
+    cumprob[0] =  probarr[0]; //I have to do the first by end.
     for(i=1;i < p; i++){
         probarr[i]=  probarr[i]/sum;
-
-	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
-        //cumprob[i]=cumprob[i-1] + probarr[i]; //Here I sum the cumulative probability
-	cumprob[i]=cumprob[i-1] + double(probarr[i]); //Here I sum the cumulative probability
+        cumprob[i]=cumprob[i-1] + probarr[i]; //Here I sum the cumulative probability
     }
     /*Now let's sample the strategy */
     
-	// ***** AS sum now is of type myMP_float, I'm going to use an other variable for the RNG ****** //
-
-//    sum= gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
-//    i=binaryprobsearch(&cumprob[0],p,sum); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
-
-
-    double rng_tmp = gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
-    i=binaryprobsearch(&cumprob[0],p,rng_tmp); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
+    sum= gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
+    i=binaryprobsearch(&cumprob[0],p,sum); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
    /*Note that if I had to sample many times from the same distribution, it would have been smarter to use the GSL tool for "General Discrete Distributions"
     Here I need to sample only one, hence I sample it by hand, using a binary search method*/
     

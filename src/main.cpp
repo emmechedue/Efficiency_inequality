@@ -141,12 +141,10 @@ int main() {
 	// The arrays describing agents	
 	for(i=0;i<cons.N;i++){
 	
-		// ***** WHY NOT INITIALISE WEALTH OF ALL AGENTS TO BE 1 !? ***** //
-		// Because we can be interested in studying a distribution of wealth
 		// Initial wealth W0 is equal for all
-    	w[i]=cons.W0;		
-		wealth=cons.N*cons.W0; //Total initial wealth. I don't really need to initialize this, but it's better anyway
-		oldwealth=wealth; //It is important to initialize this!
+    		w[i]=cons.W0;		
+		//wealth=cons.N*cons.W0; //Total initial wealth. I don't really need to initialize this, but it's better anyway
+		//oldwealth=wealth; //It is important to initialize this!
 		// Intial rank is efectivly random
     		rank[i]=i;		
 		
@@ -156,9 +154,14 @@ int main() {
 		// All initial trategies are full defection = contribution of all agents is 0
     		alpha[i]=0; 
 	}
-	// ***** WHY NOT INITIALISE WEALTH OF ALL AGENTS TO BE 1 !?  --> DON'T RENORMALIZE! ***** //
 	// Renormalise wealth w[]
-	//renormalizearray(w,cons.N);
+	renormalizearray(w,cons.N);
+
+	//Total initial wealth. I don't really need to initialize this, but it's better anyway
+	wealth = sumofvector(w, cons.N);
+
+	//It is important to initialize this!
+	oldwealth=wealth; 
 
 	// Now I fill up the output files at t=0
 	printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons);	// Print time, gini coefficient, efficiency 
@@ -268,6 +271,7 @@ int main() {
 		eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
 		oldwealth = wealth;		 
 
+		//eff = sumofvector(w, cons.N) - 1. ; //Here I compute the total amount of wealth. Since the total wealth was normalized to one before, this is the increase in percentage of wealth
 		// These 3 lines here are to compute proper averages of eff. 
 		// This is in case I perform many iterations without printing.
 		counteff++; 

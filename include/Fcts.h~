@@ -24,12 +24,10 @@
 #include <vector>       
 #include <new> 
 
-// Boost multiprecision
-#include <boost/multiprecision/cpp_dec_float.hpp>
-
 // My includes
 #include "Constants.h"
-#include "mpEXP.h"
+#include "mpEXP.h" 
+
 
 using namespace std;
 
@@ -153,26 +151,6 @@ void renormalizearray(double *w, int N){
     return ;
 }
 
-// Renaormalize array of myMP_float
-
-/*This function renormalizes an array of size N such that its sum amounts to 1*/
-void renormalizearray(myMP_float *w, int N){
-    myMP_float sum = 0.0;
-    int i;
-    
-    //Let's compute the total sum of the array
-    for(int i=0;i<N;i++){
-        sum = sum + w[i];
-    }
- 
-    // Now let's renormalize
-    for(i=0;i<N;i++){
-        w[i] = w[i]/sum;
-    }
-    
-    return ;
-}
-
 double computeaverage(double *vec, int n){ //This function computes the non-weighted average of a vector vec of length n
     int i;
     double res;
@@ -250,17 +228,19 @@ double computegini(double *w, Constants cons){
 	return G;
 }
 
+// ***** EFFECTIVLY NOT USING THIS ***** //
 /*This function here just compute the logit probability as the one in eq. one of "The Logit response dynamics" paper*/
 double logitprob(double beta, double util){
     double out;
-
-	//out = exp(beta * util);
-	//cout << "Usual exp(" << beta << "*" << util << "): " << exp(beta * util) << endl; 	
-	out = double(mpEXPcpp(beta*util));
-	//cout << "mpEXP exp(" << beta << "*" << util << "): " << out << endl;
+    
+    out = exp(beta * util);
+cout << "usual exp(" << beta << "*" << util << "): " << out << endl;
     
     return out;
 }
+// ************************************* //
+
+
 
 /************************* Function that prints all the parameters in a file **************************************/
 void printparamsingleloop(ofstream& filec, Constants cons){
@@ -268,7 +248,7 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"N= "<<cons.N<<endl<<endl;
 	filec<<"#Time at which I stop the simulation:"<<endl;
 	filec<<"T= "<<cons.T<<endl<<endl;
-    filec<<"#Time interval to print my data:"<<endl;
+        filec<<"#Time interval to print my data:"<<endl;
 	filec<<"interval= "<<cons.interval<<endl<<endl;
 	filec<<"#Size of the groups:"<<endl;
 	filec<<"S= "<<cons.S<<endl<<endl;
@@ -284,9 +264,9 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"W0= "<<cons.W0<<endl<<endl;
 	filec<<"#Number that indicates the choice of what are we using to rank agents in the groups:"<<endl;
 	filec<<"Choice= "<<cons.Choice<<endl<<endl;
-	filec<<"#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
-	filec<<"monincr= "<<cons.monincr<<endl<<endl;
-	filec<<"#This is the noise parameter in the logit:"<<endl;
+        filec<<"#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
+        filec<<"monincr= "<<cons.monincr<<endl<<endl;
+        filec<<"#This is the noise parameter in the logit:"<<endl;
 	filec<<"beta= "<<cons.beta<<endl<<endl;
 	return;
 }
@@ -334,12 +314,9 @@ int inverserank(int k, int *rank, Constants cons){
 
 /* This function here will calculate the utility that agent k would get from his group
  It is different from formgroups because here I just compute the utlity for the q-th agent*/
-
-// *** Make new function with myMP_float *** // 
-
-myMP_float getutility(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
+double getutility(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
 	int j,k; //i and j are dummy variables, k needs to be updated by hand and will be used for the rank
-	myMP_float gain, utility; //The gain in the group and the utlity of q
+	double gain, utility; //The gain in the group and the utlity of q
         int g; //The group in which q is
         int place; //The rank of q
         
@@ -349,33 +326,6 @@ myMP_float getutility(int q, double *w, double *alpha, double *O, int *rank, Con
         g = place/cons.S;
         
         /*Then I skip directly to that group and compute the gain in that group*/
-        k=cons.S * g; //I start from the k-th ranked agent
-        gain=0.0; //Set the gain of the group to 0.
-	
-        for(j=0;j<cons.S;j++){
-            gain = gain + O[rank[k+j]]; //Here I am adding to the common pool the contribution due to rank[k+j]. Due to how the systyem is designed, one of those people is q
-	}
-		
-	gain = gain*cons.Q; //Correct for the return rate
-		
-        utility = w[q]*(1.-alpha[q]) + gain; //This is the utility	
-	
-	return utility;
-}
-
-/*
-double getutility(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
-	int j,k; //i and j are dummy variables, k needs to be updated by hand and will be used for the rank
-	double gain, utility; //The gain in the group and the utlity of q
-        int g; //The group in which q is
-        int place; //The rank of q
-        
-        //  As first thing we have to compute what is the ranking of 
-        place=inverserank(q,rank,cons);
-        // As second thing we have to compute in which group the q-th agent is ending up
-        g = place/cons.S;
-        
-        // Then I skip directly to that group and compute the gain in that group
         k=cons.S * g; //I start from the k-th ranked agent
         gain=0; //Set the gain of the group to 0.
 	
@@ -389,9 +339,6 @@ double getutility(int q, double *w, double *alpha, double *O, int *rank, Constan
 	
 	return utility;
 }
-
-*/
-
 //******************************************************************************************************
 
 int binaryprobsearch(double *Gamma, int M, double x) { //Binary search. Gamma is the array of cumulative prob. M is the lenght of the array and x is the random number between zero and one
@@ -436,12 +383,7 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     
     int p= cons.monincr + 1; //Number of strategies available to k
     double lenghtofinterval= 1./cons.monincr ; //Lenght of the interval in which I divide the interval [0,1]
-    //double utility, oldutility; //they contain the possible utility for player k for a strategy and the previous one
-    //double oldutility; //they contain the possible utility for player k for a strategy and the previous one
-    //double utility[p]; // Utility array
-    myMP_float oldutility; //they contain the possible utility for player k for a strategy and the previous one
-    myMP_float utility[p]; // Utility array
-
+    double utility, oldutility; //they contain the possible utility for player k for a strategy and the previous one
     double dummyalpha[cons.N]; //A dummy vector where I copy all the strategies of the other players and then I update the one of player k
     int oldplace=0; //Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative for the first time it checks the if
     int place; //To store the ranking of the k-th agent
@@ -450,14 +392,15 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     double dummyO[cons.N]; //The dummy vector of outputs
     int M = cons.N/cons.S; //I already check in the main that I can do that
     //double probarr[p]; //the array with the probabilities;
-	// myMP_float is the custom multiprecision float defined in mpEXP.h
-    myMP_float probarr[p]; //the array with the probabilities;
-    vector<double> cumprob (p,0); //The array with the cumulative probabilities
     //double sum; //dummy variable
-	// myMP_float is the custom multiprecision float defined in mpEXP.h
-    myMP_float sum; //dummy variable
-    double tmp_var;
+	vector<double> cumprob (p,0); //The array with the cumulative probabilities
+
+	// ***** FOR probarr[] and sum I'm going to use myMP_float from myEXP.h ****** //
+	myMP_float probarr[p];
+	myMP_float sum;
     
+
+
     for(i=0; i<cons.N ; i++){ //Here I copy the vector of strategy into this fake one. Note that I don't directly pass the pointer because I want to manipulate this one. Hence I have to copy all the array
         dummyalpha[i]=alpha[i];
     }
@@ -466,38 +409,6 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     
     /************* This is the loop over all the possible strategies for player k *****************
      * Here I also compute the probability of a certain strategy */
-
-// ***** I MAKE A NEW LOOP HERE: 1) Calculste the array of utilites; 2) normalize it; 3) Calculate the array of probabilites.
-
-// *** Array of Utilities *** //
-    for(i=0; i < p ; i++){
-        dummyalpha[k]  = i*lenghtofinterval; //Set the strategy of k 
-        makeorder(r,w,dummyalpha,dummyrank,cons,dummyO); //Make the rankings
-        place=inverserank(k,dummyrank,cons); //The position where k is placed
-        if(place==oldplace){ //If the rank of k is the same, I don't have to reform the groups. I just update the utility
-            utility[i] = oldutility + lenghtofinterval * w[k] * (cons.Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number
-        }
-        else{ //In this other case I actually have to reform the group
-            utility [i] = getutility(k, w, dummyalpha, dummyO, dummyrank, cons, M); //Actually form the group and compute the utility
-        }
-
-	        
-        oldutility=utility[i];
-        oldplace=place;
-}
-
-// *** Normalize the Utilities array *** //
-renormalizearray(utility,p);
-
-// *** Now calcualte the probability array *** //
-   for(i=0; i < p ; i++){
-        //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
-        probarr[i] = mpEXPcpp(cons.beta*utility[i]);
-	cout << "mpEXP exp(" << cons.beta << "*" << utility[i] << "): " << probarr[i] << endl;
-        sum = sum + probarr[i];
-    }
-
-	/*
     for(i=0; i < p ; i++){
         dummyalpha[k]  = i*lenghtofinterval; //Set the strategy of k 
         makeorder(r,w,dummyalpha,dummyrank,cons,dummyO); //Make the rankings
@@ -508,34 +419,42 @@ renormalizearray(utility,p);
         else{ //In this other case I actually have to reform the group
             utility=getutility(k, w, dummyalpha, dummyO, dummyrank, cons, M); //Actually form the group and compute the utility
         }
-
+        
+	
         //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
-        probarr[i] = mpEXPcpp(cons.beta*utility);
-	cout << "mpEXP exp(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
+	
+	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
+	probarr[i] = mpEXP(cons.beta*utility);
         sum = sum + probarr[i];
+
+	// ***** Now print the exponent for control ***** //
+	cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
         
         oldutility=utility;
         oldplace=place;
     }
     
-	*/
-
     /*Now let's renormalize the probabilities and create the array of cumulative probabilities*/
     
     probarr[0] =  probarr[0]/sum;
-    //cumprob[0] =  probarr[0]; //I have to do the first by end.
-    cumprob[0] =  double(probarr[0]); //I have to do the first by end.
+    cumprob[0] =  probarr[0]; //I have to do the first by end.
     for(i=1;i < p; i++){
         probarr[i]=  probarr[i]/sum;
+
+	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
         //cumprob[i]=cumprob[i-1] + probarr[i]; //Here I sum the cumulative probability
-        cumprob[i]=cumprob[i-1] + double(probarr[i]); //Here I sum the cumulative probability
+	cumprob[i]=cumprob[i-1] + double(probarr[i]); //Here I sum the cumulative probability
     }
     /*Now let's sample the strategy */
     
-    //sum= gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
-    tmp_var = gsl_ran_flat(gslpointer,0,1);
-    //i=binaryprobsearch(&cumprob[0],p,sum); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
-    i=binaryprobsearch(&cumprob[0],p,tmp_var); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
+	// ***** AS sum now is of type myMP_float, I'm going to use an other variable for the RNG ****** //
+
+//    sum= gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
+//    i=binaryprobsearch(&cumprob[0],p,sum); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
+
+
+    double rng_tmp = gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
+    i=binaryprobsearch(&cumprob[0],p,rng_tmp); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
    /*Note that if I had to sample many times from the same distribution, it would have been smarter to use the GSL tool for "General Discrete Distributions"
     Here I need to sample only one, hence I sample it by hand, using a binary search method*/
     
@@ -544,8 +463,8 @@ renormalizearray(utility,p);
     return ;
 }
 
-/*This function takes an old average and updates it to the new average based on i. 
-i is the number of event I had to average before (so minus the one I'm averaging now).
+/*This function takes an old average and updates it to the new average based on i
+ i is the number of event I had to average before (so minus the one I'm averaging now)
  Hence if it is the first time I'm computing the average, i=0.*/
 double updateaverages(double oldval, double newval, int i){
     double res;
