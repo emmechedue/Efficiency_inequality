@@ -24,14 +24,14 @@ dummy = config["N"]
 N=int(dummy)
 dummy = config["T"]
 T=int(dummy)
-dummy = config["interval"]
-interval = float(dummy)
+#dummy = config["interval"]
+#interval = float(dummy)
 dummy = config["S"]
 S=int(dummy)
 dummy = config["Q"]
 Q=float(dummy)
-dummy = config["lambda"]
-lam=float(dummy)
+#dummy = config["lambda"]
+#lam=float(dummy)
 dummy = config["mu"]
 mu=float(dummy)
 dummy = config["sigmag"]
@@ -55,7 +55,8 @@ legend4=r'$\alpha_i$'
 
 #*********************************************************
 
-timepoints=int(T/interval) # Here I compute how many steps I have
+#timepoints=int(T/interval) # Here I compute how many steps I have
+timepoints=T # Here I compute how many steps I have
 
 
 #************* NOW LET'S MAKE THE VIDEOS *********************
@@ -67,6 +68,7 @@ timepoints=int(T/interval) # Here I compute how many steps I have
 t, c_average= np.loadtxt("./time1.txt", usecols=(0,3), unpack=True) #Here I load the time and the average cooperation
 w_table=np.loadtxt("./wealth1.txt")
 c_table=np.loadtxt("./cooperation1.txt")
+r_table=np.loadtxt("./talent1.txt")
 #**************************************************************************************
 
 
@@ -84,7 +86,8 @@ for i in range(timepoints+1): #It is +1 because I have the 0th time step
 	ax = fig.add_subplot(111)
 	ax.scatter(c_table[i], w_table[i], s = 20,marker='o', vmin=0, vmax=1)
 	plt.title("Scatter plot of wealth and cooperation in case "+legend1+" is rewarded")
-	plt.ylabel('Normalized wealth')
+	//plt.ylabel('Normalized wealth')
+	plt.ylabel('Wealth')
 	plt.xlabel('Percentage of contribution')
 	plt.plot(c_average[i],average, 'k_',ms=16,mew=3)
 	plt.plot(c_average[i],average, 'k|',ms=16,mew=3)

@@ -6,7 +6,8 @@ CXX=g++
 # Flags for the libraries etc.
 # gsl for the RNG
 # gmp for multiprecision nr. 
-LDFLAGS = -lgsl -lgslcblas -lgmp -lgmpxx 
+# mpfr for multiprecision nr.
+LDFLAGS = -lgsl -lgslcblas -lgmp -lgmpxx -lmpfr
 
 # Flag for your Boost 
 BOOST=/usr/local/boost_1_58_0

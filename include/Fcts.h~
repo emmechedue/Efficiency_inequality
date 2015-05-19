@@ -234,7 +234,7 @@ double logitprob(double beta, double util){
     double out;
     
     out = exp(beta * util);
-cout << "usual exp(" << beta << "*" << util << "): " << out << endl;
+    //cout << "usual exp(" << beta << "*" << util << "): " << out << endl;
     
     return out;
 }
@@ -248,14 +248,14 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"N= "<<cons.N<<endl<<endl;
 	filec<<"#Time at which I stop the simulation:"<<endl;
 	filec<<"T= "<<cons.T<<endl<<endl;
-        filec<<"#Time interval to print my data:"<<endl;
-	filec<<"interval= "<<cons.interval<<endl<<endl;
+        //filec<<"#Time interval to print my data:"<<endl; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
+	//filec<<"interval= "<<cons.interval<<endl<<endl;
 	filec<<"#Size of the groups:"<<endl;
 	filec<<"S= "<<cons.S<<endl<<endl;
 	filec<<"#Return rate:"<<endl;
 	filec<<"Q= "<<cons.Q<<endl<<endl;
-	filec<<"#Lambda parameter for the Exponential distribution:"<<endl;
-	filec<<"lambda= "<<cons.lambda<<endl<<endl;
+	//filec<<"#Lambda parameter for the Exponential distribution:"<<endl; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
+	//filec<<"lambda= "<<cons.lambda<<endl<<endl;
 	filec<<"#Mean of the Gaussian distribution for the talent:"<<endl;
 	filec<<"mu= "<<cons.mu<<endl<<endl;
 	filec<<"#Variance sigma of the Gaussian distribution for the talent:"<<endl;
@@ -379,7 +379,7 @@ int binaryprobsearch(double *Gamma, int M, double x) { //Binary search. Gamma is
 
 /************************ THIS FUNCTION IS THE ONE THAT SAMPLES WHICH STRATEGY IS THE PLAYER GOING TO CHOOSE. IT IS BASED ON THE LOGIT SAMPLING 
 The idea is that I compute for player k all the possible utilities he could have and then I sample according to the logit */
-void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, gsl_rng *gslpointer){
+void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r,Constants cons, gsl_rng *gslpointer){
     
     int p= cons.monincr + 1; //Number of strategies available to k
     double lenghtofinterval= 1./cons.monincr ; //Lenght of the interval in which I divide the interval [0,1]
@@ -402,7 +402,8 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
 
 
     for(i=0; i<cons.N ; i++){ //Here I copy the vector of strategy into this fake one. Note that I don't directly pass the pointer because I want to manipulate this one. Hence I have to copy all the array
-        dummyalpha[i]=alpha[i];
+        dummyalpha[i]=oldalpha[i];
+	//dummyalpha[i]=alpha[i];
     }
 
     sum=0; //This is to normalize the probability at the end
@@ -421,14 +422,14 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
         }
         
 	
-        //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
+        probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
 	
 	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
-	probarr[i] = mpEXP(cons.beta*utility);
+	//probarr[i] = mpEXP(cons.beta*utility);
         sum = sum + probarr[i];
 
 	// ***** Now print the exponent for control ***** //
-	cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
+	//cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
         
         oldutility=utility;
         oldplace=place;
@@ -437,7 +438,10 @@ void updatestrategy(int k, double *alpha, double *w, double *r,Constants cons, g
     /*Now let's renormalize the probabilities and create the array of cumulative probabilities*/
     
     probarr[0] =  probarr[0]/sum;
-    cumprob[0] =  probarr[0]; //I have to do the first by end.
+
+	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
+    //cumprob[0] =  probarr[0]; //I have to do the first by end.
+	cumprob[0] =  double(probarr[0]); //I have to do the first by end.
     for(i=1;i < p; i++){
         probarr[i]=  probarr[i]/sum;
 

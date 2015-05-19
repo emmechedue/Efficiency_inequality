@@ -12,18 +12,18 @@
 
 class Constants{
 	public:
-	Constants(); //Default constructor and destructor
+	Constants();	//Default constructor and destructor
 	~Constants();
-	int N; //Number of agents playing the game
-	int T;//Time at which I want to stop my simulation
-        double interval; //time interval to print my data
-	int S; //Size of the groups
-	double Q; //Return rate
-	double lambda; //Parameter for the Exponential distribution, the mean
-	double mu; //Mean of the Gaussian distribution for the talent
+	int N;		//Number of agents playing the game
+	int T;		//Time at which I want to stop my simulation
+        //double interval; //time interval to print my data // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
+	int S; 		//Size of the groups
+	double Q; 	//Return rate
+	//double lambda; //Parameter for the Exponential distribution, the mean // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
+	double mu; 	//Mean of the Gaussian distribution for the talent
 	double sigmag; //Variance sigma of the Gaussian distribution for the talent
-	double W0; //Initial wealth value
-	int Choice; //Indicates the choice of what are we using to rank agents in the groups
-        int monincr; //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
-        double beta; //This is the noise parameter in the logit
+	double W0; 	//Initial wealth value
+	int Choice; 	//Indicates the choice of what are we using to rank agents in the groups
+        int monincr; 	//Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
+        double beta; 	//This is the noise parameter in the logit
 };

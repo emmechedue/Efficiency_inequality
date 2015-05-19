@@ -55,10 +55,10 @@ Constants::Constants(){ //Note that name must be the entire path; i.e. "./config
 	//Here I cast when I actually have integers
 	N=int(vector[0]); //Number of agents playing the game
 	T=vector[1];//Time at which I want to stop my simulation
-        interval=vector[2]; 
+        //interval=vector[2]; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	S=int(vector[3]); //Size of the groups
 	Q=vector[4]; //Return rate
-	lambda=vector[5]; //Parameter for the Exponential distribution, the mean
+	//lambda=vector[5]; //Parameter for the Exponential distribution, the mean // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	mu=vector[6]; //Mean of the Gaussian distribution for the talent
 	sigmag=vector[7]; //Variance sigma of the Gaussian distribution for the talent
 	W0=vector[8]; //Initial wealth value

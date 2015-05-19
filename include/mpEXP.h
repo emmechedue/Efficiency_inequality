@@ -1,6 +1,7 @@
 // include BOOST multiprecision cpp_dec_float
 //#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/mpfr.hpp>
 
 
 
@@ -9,7 +10,8 @@ using namespace boost::multiprecision;
 
 // *** MAKE CUSTOM MULTIPRECISION TYPE *** // 
 //typedef number<cpp_dec_float<256, long long> > myMP_float;
-typedef number<gmp_float<500> > myMP_float;
+//typedef number<gmp_float<100> > myMP_float;
+typedef number<mpfr_float_backend<100> > myMP_float;
 
 // mpEXPcpp - Exponent function using Boost::multiprecision cpp_dec_float 
 
