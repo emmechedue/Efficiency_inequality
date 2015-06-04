@@ -31,6 +31,10 @@ int main() {
 	// ********************* INITIALISATION ********************* //		
 	// ********************************************************** //
 
+	// Print for testing
+	cout << "Starting initialising" << endl;
+
+
 	// *********** Initialising fields and variables *********** //
 	
 	// RNG Stuff 	
@@ -81,6 +85,10 @@ int main() {
 
 	// *********** Initialising the GSL Mersenne twister RNG & a C srand RNG *********** //
 
+	// Print for testing
+	cout << "Initialising the RNG" << endl;
+
+
     	// GSL Mersenne Twister 19937 RNG
 	pfile = fopen ("/dev/urandom", "r");
 	i=fread (&seed, sizeof (seed), 1, pfile);	// I added the rand= ... just to not be bothered anymore by the warnings!
@@ -91,8 +99,11 @@ int main() {
 	// C srand RNG
 	srand(seed); 					// It's unlikely, but I might need it to break ties in the ordering
 
-	
 	// *********** Initialising the OUTPUT FILES with HEADERS *********** //
+
+	// Print for testing
+	cout << "Initialising the output files" << endl;
+
 
 	// The WEALTH file 	
 	filew.open(filenamew,ios::out|ios::trunc); 
@@ -141,7 +152,6 @@ int main() {
 	filep.open(filenamep,ios::out|ios::trunc);
 	printparamsingleloop(filep,cons);
 	filep.close();
-
 
 
 	// *********** Initialise description of agents and groups (START GENERATING ALL THE STUFF) *********** //
@@ -202,6 +212,9 @@ int main() {
 
 	
 	
+	// Print for testing
+	cout << "Initialisation complete" << endl;
+
 
 
 	// ********************* END OF INITIALISATION ********************* //		
@@ -261,6 +274,7 @@ int main() {
 
 
 	}
+
 
 
 	// ********************* END OF BIG TIME LOOP ********************* //	
