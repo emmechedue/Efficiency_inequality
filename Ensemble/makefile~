@@ -5,11 +5,11 @@ CXX=g++
 
 # Flags for the libraries etc.
 # gsl for the RNG
-# gmp for multiprecision nr. 
-# mpfr for multiprecision nr.
+# gmp for multiprecision --> needed for GMP & MPFR 
+# mpfr for multiprecision --> needed for MPFR
 LDFLAGS = -lgsl -lgslcblas -lgmp -lgmpxx -lmpfr
 
-# Flag for your Boost 
+# Flag for your Boost --> needed for multiprecision (all three versions)
 BOOST=/usr/local/boost_1_58_0
 #BOOST=/usr/include/boost
 

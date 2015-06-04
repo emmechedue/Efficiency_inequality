@@ -1,0 +1,84 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+\usepackage{hyperref}
+
+
+\author{Madis Ollikainen}
+\title{Ensemble simulation overview \& other specifications (short)}
+
+\begin{document}
+
+\maketitle
+
+\section{Structure of the joint directory}
+I now made two directories: \emph{Ensemble} and \emph{Single} to hold the files for the ensemble simulations and the single 'society' simulation. Also I used the word 'society' in the code comments for referencing to one entity of the ensemble. Both of the directories have there own \emph{src}, \emph{include} and \emph{obj} directories, as well as a \emph{makefile} and the other extra files. 
+
+\section{Make, libs and file names}
+Running \emph{make} in either of the directories should produce a executable named \emph{run\_ensemble} or \emph{run\_single}. Also the file names now have the prefix referring to either \emph{ensemble} or \emph{single}. Even with the synchronous strategy updating the wealth grow with huge speed, so it is still a good idea to use a multi-precision library for the logit probability sampling. Both of the code use MPFR multiprecision library at the moment. For this it is needed to link both MPFR and GMP multi-precision library. You can also change the multi-precision library to GMP or the only BOOST headers CPP\_FLOAT, for that just have a look at \emph{include/mpEXP.h} and uncomment/comment the necessary thing both in the includes and in the \emph{myMP\_float} definition sections. Info about the multi-precision libraries and downloads can be gotten from: 
+\begin{itemize}
+\item \url{<http://www.boost.org/doc/libs/1_58_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats.html>}
+\item \url{<https://gmplib.org/>}       
+\item \url{<http://www.mpfr.org/>}
+\end{itemize}
+Also the configure file has be changed for the ensemble version. It now has an entry NE for the number of 'societies' in the ensemble aka. the ensemble size. And both the ensemble and the single version lack the info about the exponential time sampling (although under the Single directory you can still find the files for the asynchronous strategy updating). 
+
+\section{Ensemble outputting}
+The ensemble code writes six output files. 
+\begin{enumerate}
+\item \emph{parameters.txt} $\rightarrow$ Re-prints the configure file as before. 
+
+\item \emph{talent.txt} $\rightarrow$ Talent for each player in each society, with the structure:
+
+\begin{center}
+\begin{tabular}{c c c c c c}
+Player 1 Sc.1 & Player 1 Sc.2 & Player 1 Sc.3 & Player 1 Sc.4 & \dots \\ 
+Player 2 Sc.1 & Player 2 Sc.2 & Player 2 Sc.3 & Player 2 Sc.4 & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &   
+\end{tabular} 
+\end{center}
+
+
+\item \emph{time.txt} $\rightarrow$ Ensemble averages at each time step, with the structure:
+
+\begin{center}
+\begin{tabular}{c c c c c c}
+Time step & Total wealth & Growth \% & Gini coef. & Average co-op/strategy \\ 
+ & & & & in society \\
+ \vdots & \vdots &  \vdots &  \vdots & \vdots
+\end{tabular} 
+\end{center}
+
+\item \emph{wealth.txt} $\rightarrow$ Total wealth for each society at each time step, with the structure:
+
+\begin{center}
+\begin{tabular}{c c c c c c}
+Time step & Total wealth Sc. 1 & Total wealth Sc. 2 & Total wealth Sc. 3 & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &
+\end{tabular} 
+\end{center}
+
+\item \emph{cooperation.txt} $\rightarrow$ Average cooperation/strategy for each society at each time step, with the structure:
+
+\begin{center}
+\begin{tabular}{c c c c c }
+Time step & Avg Co-op/strategy Sc. 1 & Avg Co-op/strategy Sc. 2  & \dots \\
+\vdots &  \vdots &  \vdots &
+\end{tabular} 
+\end{center}
+
+\item \emph{GiniCoef.txt} $\rightarrow$ Gini coefficient for each society at each time step, with the structure:
+
+\begin{center}
+\begin{tabular}{c c c c c c}
+Time step & Gini coef. Sc. 1 & Gini coef. Sc. 2 & Gini coef. Sc. 3  & \dots \\ 
+\vdots & \vdots &  \vdots &  \vdots &
+\end{tabular} 
+\end{center}
+
+\end{enumerate}
+
+\section{Analysis \& plotting}
+No analysis nor plotting tool is yet available for the ensemble version. Do you have any specific ideas in mind, which kinds of plot would you like to get? Or maybe you think that for the ensemble version the plots will be straight forward from the output data and no special script is necessary? Also, would you like to change anything in the outputting or add anything?
+
+\end{document}
