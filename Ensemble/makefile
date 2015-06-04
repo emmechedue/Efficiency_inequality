@@ -31,7 +31,7 @@ TYPE = ensemble
 
 # Declare the name of our program 
 #PROGRAM = inequality_inefficiency_logit_single_loop
-PROGRAM = $(TYPE)_run
+PROGRAM = run_$(TYPE)
 
 # The needed object files (we make these from the source code)
 OBJ = obj/$(TYPE)_main.o obj/$(TYPE)_Constants.o 
