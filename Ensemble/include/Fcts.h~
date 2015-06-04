@@ -134,6 +134,16 @@ double sumofvector(double *a, int N){
     return res;
 }
 
+/*This function just returns the sum over the vector of length n*/
+double sumofSubVector(double *a, int begin, int end){
+
+	double tmp = 0;
+
+	for(int i=begin; i<(end + 1); i++){
+		tmp = tmp + a[i];
+	}
+}
+
 
 /*This function renormalizes an array of size N such that its sum amounts to 1*/
 void renormalizearray(double *w, int N){
@@ -270,6 +280,33 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"beta= "<<cons.beta<<endl<<endl;
 	return;
 }
+
+/************************* Function that prints all the parameters in a file **************************************/
+void ensemblePrintParams(ofstream& filec, Constants cons){
+	filec << "# Number of 'societies' in the ensemble" << endl;
+	filec << "NE= " << cons.NE << endl << endl;	
+	filec<<"# Number of agents playing the game:"<<endl;
+	filec<<"N= "<<cons.N<<endl<<endl;
+	filec<<"# Time at which I stop the simulation:"<<endl;
+	filec<<"T= "<<cons.T<<endl<<endl;
+	filec<<"# Size of the groups:"<<endl;
+	filec<<"S= "<<cons.S<<endl<<endl;
+	filec<<"# Return rate:"<<endl;
+	filec<<"Q= "<<cons.Q<<endl<<endl;
+	filec<<"# Mean of the Gaussian distribution for the talent:"<<endl;
+	filec<<"mu=  "<<cons.mu<<endl<<endl;
+	filec<<"# Variance sigma of the Gaussian distribution for the talent:"<<endl;
+	filec<<"sigmag= "<<cons.sigmag<<endl<<endl;
+	filec<<"# Initial wealth value:"<<endl;
+	filec<<"W0= "<<cons.W0<<endl<<endl;
+	filec<<"# Number that indicates the choice of what are we using to rank agents in the groups:"<<endl;
+	filec<<"Choice= "<<cons.Choice<<endl<<endl;
+        filec<<"# Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
+        filec<<"monincr= "<<cons.monincr<<endl<<endl;
+        filec<<"# This is the noise parameter in the logit:"<<endl;
+	filec<<"beta= "<<cons.beta<<endl<<endl;
+	return;
+}
 /*****************************************************************************************/
 
 /************************* Function that prints the various output at every time loop. ****************************
@@ -297,6 +334,86 @@ void printstuffsingleloop(ofstream& filet,ofstream& filew, ofstream& filec ,doub
     filec<<endl;
     return;
 }
+
+
+// ----- Ensemble print function ----- // 
+
+void ensemblePrint(ofstream& filet, ofstream& filew, ofstream& filec, ofstream& fileg, double t, double *eff, double *tot_w, double *w, double *alpha, Constants cons, int N, int NE){
+
+	double Gini[NE] = {};		// Gini for each society
+	double Coop[NE] = {};		// Average co-op for each society
+	double avg_Gini = 0.0; 		// Ensemble average index of inequality. Inequality is computed as the gini coefficient (see note in the fcts)
+	double avg_Coop = 0.0; 		// Ensemble average average_level_of_cooperation at time step t   
+	double avg_totWealth = 0.0;	// Ensemble average of total wealth 
+	double avg_eff = 0.0;		// Ensemble average of growth %
+	        
+
+	// Calculate the Gini coef & Co-op and their and total wealth & growth % ensemble averages //
+
+	// Loop over all societies  	
+	for (int k=0; k<NE; k++){
+
+		// Extract the wealth array for the k-th 'society'
+		// And calculate the average co-op for k-th 'society'
+		double w_k[N];
+		FillSubArray(w, w_k, k, N);
+		FillSubArray(alpha, Coop, k, N);
+	
+		// Arithmetic average of the co-op
+		Coop[k] = Coop[k]/N;
+
+		// Ensemble average of co-op
+		avg_Coop += Coop[k];
+
+		// Gini coef
+		Gini[k] = computegini(w_k, cons);
+		avg_Gini += Gini[k];
+
+		// Ensemble average of total Wealth 
+		avg_totWealth += tot_w[k];
+
+		// Ensemble average of growth %
+		avg_eff += eff[k];
+	}
+
+	// Arithmetic average for ensemble averages
+	avg_Gini = avg_Gini/NE;
+	avg_Coop = avg_Coop/NE;
+	avg_totWealth = avg_totWealth/NE;
+	avg_eff = avg_eff/NE;
+	
+	// Printing //
+
+	// Ensemble averages (time file): time step, total wealth, growth %, Gini coef, average Co-op.  
+    	filet << t << "\t" << avg_totWealth << "\t" << avg_eff << "\t" << avg_Gini << "\t" << avg_Coop << endl;
+
+	// TotWealth, Gini, avg Coop for each society
+	filew << t;
+	filec << t;
+	fileg << t;	
+	for (int k=0; k<NE; k++){
+		filew << "\t" << tot_w[k];
+		filec << "\t" << Coop[k];
+		fileg << "\t" << Gini[k];
+	}
+	filew << endl;
+	filec << endl;
+	fileg << endl; 
+
+	// End the print function
+	return;
+}
+
+// ----- Function to get subarray corresponding to the k-th society ----- //
+void FillSubArray(double *BigArray, double *SubArray, int k, int N){
+
+	for (int i=0; i<N; i++){
+		SubArray[i] = BigArray[k*N + i];
+	}
+
+} 
+
+
 /**************************************************************************/
 /*This function here returns the rank of the agent k. It's the inverse of rank*/
 int inverserank(int k, int *rank, Constants cons){
@@ -422,10 +539,10 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
         }
         
 	
-        probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
+        //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
 	
 	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
-	//probarr[i] = mpEXP(cons.beta*utility);
+	probarr[i] = mpEXP(cons.beta*utility);
         sum = sum + probarr[i];
 
 	// ***** Now print the exponent for control ***** //
@@ -466,6 +583,98 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
     
     return ;
 }
+
+// ----- Function which return the updated stragedy for k-th player ----- // 
+// The idea is that I compute for player k all the possible utilities he could have and then I sample according to the logit 
+double NewStrategy(int k, double *oldalpha, double *w, double *r,Constants cons, gsl_rng *gslpointer){
+    
+    int p= cons.monincr + 1; //Number of strategies available to k
+    double lenghtofinterval= 1./cons.monincr ; //Lenght of the interval in which I divide the interval [0,1]
+    double utility, oldutility; //they contain the possible utility for player k for a strategy and the previous one
+    double dummyalpha[cons.N]; //A dummy vector where I copy all the strategies of the other players and then I update the one of player k
+    int oldplace=0; //Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative for the first time it checks the if
+    int place; //To store the ranking of the k-th agent
+    int i;
+    int dummyrank[cons.N]; //The vector that will do all the ranking
+    double dummyO[cons.N]; //The dummy vector of outputs
+    int M = cons.N/cons.S; //I already check in the main that I can do that
+    //double probarr[p]; //the array with the probabilities;
+    //double sum; //dummy variable
+	vector<double> cumprob (p,0); //The array with the cumulative probabilities
+
+	// ***** FOR probarr[] and sum I'm going to use myMP_float from myEXP.h ****** //
+	myMP_float probarr[p];
+	myMP_float sum;
+    
+
+
+    for(i=0; i<cons.N ; i++){ //Here I copy the vector of strategy into this fake one. Note that I don't directly pass the pointer because I want to manipulate this one. Hence I have to copy all the array
+        dummyalpha[i]=oldalpha[i];
+	//dummyalpha[i]=alpha[i];
+    }
+
+    sum=0; //This is to normalize the probability at the end
+    
+    /************* This is the loop over all the possible strategies for player k *****************
+     * Here I also compute the probability of a certain strategy */
+    for(i=0; i < p ; i++){
+        dummyalpha[k]  = i*lenghtofinterval; //Set the strategy of k 
+        makeorder(r,w,dummyalpha,dummyrank,cons,dummyO); //Make the rankings
+        place=inverserank(k,dummyrank,cons); //The position where k is placed
+        if(place==oldplace){ //If the rank of k is the same, I don't have to reform the groups. I just update the utility
+            utility=oldutility + lenghtofinterval * w[k] * (cons.Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number
+        }
+        else{ //In this other case I actually have to reform the group
+            utility=getutility(k, w, dummyalpha, dummyO, dummyrank, cons, M); //Actually form the group and compute the utility
+        }
+        
+	
+        //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
+	
+	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
+	probarr[i] = mpEXP(cons.beta*utility);
+        sum = sum + probarr[i];
+
+	// ***** Now print the exponent for control ***** //
+	//cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
+        
+        oldutility=utility;
+        oldplace=place;
+    }
+    
+    /*Now let's renormalize the probabilities and create the array of cumulative probabilities*/
+    
+    probarr[0] =  probarr[0]/sum;
+
+	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
+    //cumprob[0] =  probarr[0]; //I have to do the first by end.
+	cumprob[0] =  double(probarr[0]); //I have to do the first by end.
+    for(i=1;i < p; i++){
+        probarr[i]=  probarr[i]/sum;
+
+	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
+        //cumprob[i]=cumprob[i-1] + probarr[i]; //Here I sum the cumulative probability
+	cumprob[i]=cumprob[i-1] + double(probarr[i]); //Here I sum the cumulative probability
+    }
+    /*Now let's sample the strategy */
+    
+	// ***** AS sum now is of type myMP_float, I'm going to use an other variable for the RNG ****** //
+
+//    sum= gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
+//    i=binaryprobsearch(&cumprob[0],p,sum); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
+
+
+    double rng_tmp = gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
+    i=binaryprobsearch(&cumprob[0],p,rng_tmp); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
+   /*Note that if I had to sample many times from the same distribution, it would have been smarter to use the GSL tool for "General Discrete Distributions"
+    Here I need to sample only one, hence I sample it by hand, using a binary search method*/
+    
+    //alpha[k]=i*lenghtofinterval; //Here I set the value for alpha[k]. I.e. I set the strategy for agent k
+    
+	// Return the new strategy
+    return i*lenghtofinterval;
+}
+
 
 /*This function takes an old average and updates it to the new average based on i
  i is the number of event I had to average before (so minus the one I'm averaging now)

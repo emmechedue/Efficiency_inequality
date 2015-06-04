@@ -26,11 +26,15 @@ CXXFLAGS = -Wall -std=c++11  $(LDFLAGS) $(INCFLAGS)
 
 #####################################################
 
+# The simu type
+TYPE = ensemble
+
 # Declare the name of our program 
-PROGRAM = inequality_inefficiency_logit_single_loop
+#PROGRAM = inequality_inefficiency_logit_single_loop
+PROGRAM = $(TYPE)_run
 
 # The needed object files (we make these from the source code)
-OBJ = obj/main.o obj/Constants.o 
+OBJ = obj/$(TYPE)_main.o obj/$(TYPE)_Constants.o 
 
 # This is the first target. It will be built when you run 'make' or 'make all'
 all: $(PROGRAM) 
@@ -45,8 +49,8 @@ $(PROGRAM): $(OBJ)
 	$(CXX) $(OBJ) $(INCFLAGS) $(LDFLAGS) -o $(PROGRAM)
 
 # Rules for compiling
-obj/main.o: src/main.cpp
-	$(CXX) -c src/main.cpp -o obj/main.o $(CXXFLAGS) 
+obj/$(TYPE)_main.o: src/$(TYPE)_main.cpp
+	$(CXX) -c src/$(TYPE)_main.cpp -o obj/$(TYPE)_main.o $(CXXFLAGS) 
 
-obj/Constants.o: src/Constants.cpp
-	$(CXX) -c src/Constants.cpp -o obj/Constants.o $(CXXFLAGS) 
+obj/$(TYPE)_Constants.o: src/$(TYPE)_Constants.cpp
+	$(CXX) -c src/$(TYPE)_Constants.cpp -o obj/$(TYPE)_Constants.o $(CXXFLAGS) 
