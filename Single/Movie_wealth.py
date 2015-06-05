@@ -24,14 +24,10 @@ dummy = config["N"]
 N=int(dummy)
 dummy = config["T"]
 T=int(dummy)
-dummy = config["interval"]
-interval = float(dummy)
 dummy = config["S"]
 S=int(dummy)
 dummy = config["Q"]
 Q=float(dummy)
-dummy = config["lambda"]
-lam=float(dummy)
 dummy = config["mu"]
 mu=float(dummy)
 dummy = config["sigmag"]
@@ -44,7 +40,6 @@ dummy = config["monincr"]
 monincr=int(dummy)
 dummy = config["beta"]
 beta=double(dummy)
-
 #***************************************************************************************
 
 #**************************** Now I load everything: *****************
@@ -70,7 +65,7 @@ legend4=r'$\alpha_i$'
 #************************* NOW LET'S MAKE THE VIDEOS ********************
 
 #Let's compute the number of steps:
-timepoints=int(T/interval)
+timepoints=T
 
 #This is in how many intervals I want to divide my histograms
 KK=100

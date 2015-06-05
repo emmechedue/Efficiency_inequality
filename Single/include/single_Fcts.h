@@ -248,7 +248,7 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"N= "<<cons.N<<endl<<endl;
 	filec<<"#Time at which I stop the simulation:"<<endl;
 	filec<<"T= "<<cons.T<<endl<<endl;
-        //filec<<"#Time interval to print my data:"<<endl; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
+    //filec<<"#Time interval to print my data:"<<endl; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	//filec<<"interval= "<<cons.interval<<endl<<endl;
 	filec<<"#Size of the groups:"<<endl;
 	filec<<"S= "<<cons.S<<endl<<endl;
@@ -264,9 +264,9 @@ void printparamsingleloop(ofstream& filec, Constants cons){
 	filec<<"W0= "<<cons.W0<<endl<<endl;
 	filec<<"#Number that indicates the choice of what are we using to rank agents in the groups:"<<endl;
 	filec<<"Choice= "<<cons.Choice<<endl<<endl;
-        filec<<"#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
-        filec<<"monincr= "<<cons.monincr<<endl<<endl;
-        filec<<"#This is the noise parameter in the logit:"<<endl;
+    filec<<"#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1"<<endl;
+    filec<<"monincr= "<<cons.monincr<<endl<<endl;
+    filec<<"#This is the noise parameter in the logit:"<<endl;
 	filec<<"beta= "<<cons.beta<<endl<<endl;
 	return;
 }

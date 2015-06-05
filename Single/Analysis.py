@@ -24,14 +24,10 @@ dummy = config["N"]
 N=int(dummy)
 dummy = config["T"]
 T=int(dummy)
-dummy = config["interval"]
-interval = float(dummy)
 dummy = config["S"]
 S=int(dummy)
 dummy = config["Q"]
 Q=float(dummy)
-dummy = config["lambda"]
-lam=float(dummy)
 dummy = config["mu"]
 mu=float(dummy)
 dummy = config["sigmag"]
@@ -84,7 +80,7 @@ close()
 #********** Now let's make the plot for the Efficiency, 
 
 # First we have to define how many time points I have:
-timepoints=int(T/interval)
+timepoints=T + 1
 
 
 # Now let's plot the relative growth for each of the 4 rules
@@ -99,8 +95,8 @@ legend3=r'$\alpha_i  r_i$'
 legend4=r'$\alpha_i$'
 plt.legend((legend1,legend2,legend3,legend4),loc=4)
 plt.xlabel('time')
-plt.ylabel(r'Relative Growth, $\left(w[t]-w[t-1]\right)/w[t-1]$')
-#plt.ylabel(r'Total wealth')
+#plt.ylabel(r'Relative Growth, $\left(w[t]-w[t-1]\right)/w[t-1]$')
+plt.ylabel(r'Total wealth')
 plt.tight_layout()
 plt.savefig('growth.pdf',dpi=100)
 close()
