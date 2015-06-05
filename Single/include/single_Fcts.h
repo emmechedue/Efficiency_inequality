@@ -385,7 +385,7 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
     double lenghtofinterval= 1./cons.monincr ; //Lenght of the interval in which I divide the interval [0,1]
     double utility, oldutility; //they contain the possible utility for player k for a strategy and the previous one
     double dummyalpha[cons.N]; //A dummy vector where I copy all the strategies of the other players and then I update the one of player k
-    int oldplace=0; //Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative for the first time it checks the if
+    int oldplace=-1; //Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative for the first time it checks the if
     int place; //To store the ranking of the k-th agent
     int i;
     int dummyrank[cons.N]; //The vector that will do all the ranking
@@ -415,7 +415,7 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
         makeorder(r,w,dummyalpha,dummyrank,cons,dummyO); //Make the rankings
         place=inverserank(k,dummyrank,cons); //The position where k is placed
         if(place==oldplace){ //If the rank of k is the same, I don't have to reform the groups. I just update the utility
-            utility=oldutility + lenghtofinterval * w[k] * (cons.Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number
+            utility=oldutility + lenghtofinterval * w[k] * (cons.Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number.
         }
         else{ //In this other case I actually have to reform the group
             utility=getutility(k, w, dummyalpha, dummyO, dummyrank, cons, M); //Actually form the group and compute the utility
@@ -424,12 +424,13 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
 	
         //probarr[i] = logitprob(cons.beta , utility); //Here I compute the probability according to the logit and the sum
 	
-	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
-	probarr[i] = mpEXP(cons.beta*utility);
+		//Here I compute the probability according to the logit and the sum
+		// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
+		probarr[i] = mpEXP(cons.beta*utility);
         sum = sum + probarr[i];
 
-	// ***** Now print the exponent for control ***** //
-	//cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
+		// ***** Now print the exponent for control ***** //
+		//cout << "mpEXP(" << cons.beta << "*" << utility << "): " << probarr[i] << endl;
         
         oldutility=utility;
         oldplace=place;
@@ -439,15 +440,12 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
     
     probarr[0] =  probarr[0]/sum;
 
-	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
+	// ***** Here I declare the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
     //cumprob[0] =  probarr[0]; //I have to do the first by end.
 	cumprob[0] =  double(probarr[0]); //I have to do the first by end.
     for(i=1;i < p; i++){
         probarr[i]=  probarr[i]/sum;
-
-	// ***** Here I declear the myMP_float type probarr[i] to be double (just in case there is no automatic conversion ***** //
-        //cumprob[i]=cumprob[i-1] + probarr[i]; //Here I sum the cumulative probability
-	cumprob[i]=cumprob[i-1] + double(probarr[i]); //Here I sum the cumulative probability
+        cumprob[i]=cumprob[i-1] + double(probarr[i]); //Here I sum the cumulative probability
     }
     /*Now let's sample the strategy */
     
@@ -457,8 +455,8 @@ void updatestrategy(int k, double *alpha, double *oldalpha, double *w, double *r
 //    i=binaryprobsearch(&cumprob[0],p,sum); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
 
 
-    double rng_tmp = gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use sum here just to not use another variable
-    i=binaryprobsearch(&cumprob[0],p,rng_tmp); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
+    utility = gsl_ran_flat(gslpointer,0,1); //Generate a random number btw 0 and 1. Note that I use utility here just to not use another variable
+    i=binaryprobsearch(&cumprob[0],p,utility); //Here I compute which strategy is the agent k using. Note that I use i here just to not use another variable
    /*Note that if I had to sample many times from the same distribution, it would have been smarter to use the GSL tool for "General Discrete Distributions"
     Here I need to sample only one, hence I sample it by hand, using a binary search method*/
     

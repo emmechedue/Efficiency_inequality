@@ -63,10 +63,8 @@ int main() {
 	//int enne; 		// Int variable that I need in a time thing // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	int i; 			// Support variable 
 	//double ranvar;	// A random variable // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	double eff, oldeff;	// These are to print the efficiency and then renormalize the wealth. 
-				// Here the efficiency is defined as percentage growth
-	double wealth, oldwealth; //Wealth is the wealth at every time step. Oldwealth is a support variable I need to compute the efficiency
-	//int counteff;		// This I need to make proper averages of the efficiency	// !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
+	double eff;	// These is to print the efficiency and then renormalize the wealth. Here the efficiency is defined as percentage growth
+	double wealth, oldwealth; //Wealth is the wealth at every time step. Oldwealth is a support variable I need to compute the efficiency 
 
 	// ofstream for outputing and output files
 	ofstream filep;		// Parameter output stream 
@@ -175,9 +173,7 @@ int main() {
 	
 		// Initial wealth W0 is equal for all
     		w[i]=cons.W0;		
-		//wealth=cons.N*cons.W0; //Total initial wealth. I don't really need to initialize this, but it's better anyway
-		//oldwealth=wealth; //It is important to initialize this!
-		// Intial rank is efectivly random
+		// Intial rank is effectivly random
     		rank[i]=i;		
 		
 		// Gaussian distributed talent. Have to add the mean of the gaussian because the generator has mean zero.  
@@ -186,7 +182,7 @@ int main() {
 		// Print out the talent for each player 
 		filer << i << "\t" << r[i] << endl;
 
-		// All initial trategies are full defection = contribution of all agents is 0
+		// All initial strategies are full defection => contribution of all agents is 0
     		alpha[i]=0; 
 	}
 
@@ -203,15 +199,9 @@ int main() {
 	oldwealth=wealth; 
 
 	// Now I fill up the output files at t=0
-	//printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons);	// Print time, gini coefficient, efficiency 
-	printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons); 	// and all the wealth of the initial state.
+	printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons); 	// Print time, gini coefficient, efficiency and all the wealth of the initial state.
 
 
-	// RESET the counter for the AVERAGE of the EFFICIENTCY	
-	//counteff = -1;	// !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 	 
-
-	
-	
 	// Print for testing
 	cout << "Initialisation complete" << endl;
 
@@ -234,7 +224,7 @@ int main() {
 		// *** Update strategy for all players *** //
 		for( i=0; i<cons.N; i++){
 
-			// Here I update the strategy of agent i according to a logit distribution and using the old strategy (from previous timestep).
+			// Here I update the strategy of agent i according to a logit distribution and using the old strategy (from previous timestep). Miopic best response!
 			updatestrategy(i,alpha,oldalpha,w,r,cons, gslpointer);
 
 		}
@@ -253,21 +243,9 @@ int main() {
 		eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
 		oldwealth = wealth;		 
 
-		//eff = sumofvector(w, cons.N) - 1. ; //Here I compute the total amount of wealth. Since the total wealth was normalized to one before, this is the increase in percentage of wealth
-		// These 3 lines here are to compute proper averages of eff. 
-		// This is in case I perform many iterations without printing.
-		//counteff++; 	// I now have discrete timestep --> conter is always 0
-		eff = updateaverages(oldeff, eff, 0);
-		oldeff = eff;
 
 		// Print time, Gini coefficient, efficiency and all the wealth for the aldt timestep.
 		printstuffsingleloop(filet, filew, filec, t, eff, w, alpha,cons); 
-			
-		// RESET the counter for the AVERAGE of the EFFICIENTCY	 
-		//counteff = -1;
-	
-		// Subtract by oldt the value of interval to start counting again.
-		//oldt = oldt - cons.interval; // I'm using discrete time with fixed steps, no need for this now. 
 
 		// Print the time to commandline for checking the runtime.
 		cout<<"Timestep "<< t << endl; 		
