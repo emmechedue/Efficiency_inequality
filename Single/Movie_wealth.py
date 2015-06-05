@@ -71,8 +71,8 @@ timepoints=T
 KK=100
 
 #let's prepare the x axis	
-raggio=numpy.zeros(KK)
-for j in range(KK):
+raggio=numpy.zeros(KK+1)
+for j in range(KK+1):
 	raggio[j]=(1./KK) * j
 
 
@@ -85,9 +85,14 @@ filetype = '.png'
 # Let's make all the pictures
 for i in range(timepoints+1):
 	
+	#***** I want the histogram to be "renormalized". I.e. at every time step the maximum wealth will be 1
 	#Let's compute the histogram
-	fuffo=zeros(KK) #Here I just fill the histofram with zeros
+	fuffo=zeros(KK+1) #Here I just fill the histofram with zeros. I need +1 because it actually has to go from 0 to KK
 	test=data1[i]
+	
+	#Here I renormalize test so that the higher value of the wealth is 1
+	massim = test.max()
+	test = test/massim
 	
 	#Here I count how many hits per bin
 	
@@ -124,7 +129,7 @@ for i in range(timepoints+1):
 	
 
 # Now we make the first movie
-os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video1/*.png\" -mf type=png:fps=5 -o video_1.avi")
+os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video1/*.png\" -mf type=png:fps=5 -o wealth_1.avi")
 
 
 #************** Let's make the second video ****************************
@@ -135,9 +140,14 @@ filetype = '.png'
 # Let's make all the pictures
 for i in range(timepoints+1):
 
+	#***** I want the histogram to be "renormalized". I.e. at every time step the maximum wealth will be 1
 	#Let's compute the histogram
-	fuffo=zeros(KK) #Here I just fill the histofram with zeros
+	fuffo=zeros(KK+1) #Here I just fill the histofram with zeros. I need +1 because it actually has to go from 0 to KK
 	test=data2[i]
+	
+	#Here I renormalize test so that the higher value of the wealth is 1
+	massim = test.max()
+	test = test/massim
 	
 	#Here I count how many hits per bin
 	
@@ -174,7 +184,7 @@ for i in range(timepoints+1):
 	
 
 # Now we make the second movie
-os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video2/*.png\" -mf type=png:fps=5 -o video_2.avi")
+os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video2/*.png\" -mf type=png:fps=5 -o wealth_2.avi")
 
 
 
@@ -186,9 +196,14 @@ filetype = '.png'
 # Let's make all the pictures
 for i in range(timepoints+1):
 
+	#***** I want the histogram to be "renormalized". I.e. at every time step the maximum wealth will be 1
 	#Let's compute the histogram
-	fuffo=zeros(KK) #Here I just fill the histofram with zeros
+	fuffo=zeros(KK+1) #Here I just fill the histofram with zeros. I need +1 because it actually has to go from 0 to KK
 	test=data3[i]
+	
+	#Here I renormalize test so that the higher value of the wealth is 1
+	massim = test.max()
+	test = test/massim
 	
 	#Here I count how many hits per bin
 	
@@ -225,7 +240,7 @@ for i in range(timepoints+1):
 	
 
 # Now we make the third movie
-os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video3/*.png\" -mf type=png:fps=5 -o video_3.avi")
+os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video3/*.png\" -mf type=png:fps=5 -o wealth_3.avi")
 
 
 
@@ -237,9 +252,14 @@ filetype = '.png'
 # Let's make all the pictures
 for i in range(timepoints+1):
 
+	#***** I want the histogram to be "renormalized". I.e. at every time step the maximum wealth will be 1
 	#Let's compute the histogram
-	fuffo=zeros(KK) #Here I just fill the histofram with zeros
+	fuffo=zeros(KK+1) #Here I just fill the histofram with zeros. I need +1 because it actually has to go from 0 to KK
 	test=data4[i]
+	
+	#Here I renormalize test so that the higher value of the wealth is 1
+	massim = test.max()
+	test = test/massim
 	
 	#Here I count how many hits per bin
 	
@@ -276,7 +296,7 @@ for i in range(timepoints+1):
 	
 
 # Now we make the fourth movie
-os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video4/*.png\" -mf type=png:fps=5 -o video_4.avi")
+os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts vcodec=mpeg4:vhq:trell:mbd=2:v4mv:vb_strategy=0:vlelim=0:vcelim=0:cmp=6:subcmp=6:precmp=6:predia=3:dia=3:vme=4:vqscale=1 \"mf://./video4/*.png\" -mf type=png:fps=5 -o wealth_4.avi")
 
 
 

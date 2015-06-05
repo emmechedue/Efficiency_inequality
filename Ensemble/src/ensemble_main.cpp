@@ -46,10 +46,9 @@ int main() {
 	int NE = cons.NE;	// Number of "societies" in the ensemble
 	int N = cons.N;		// Number of agents in one "society" 
 	int M; 			// Number of groups
-	//int k; 		// Index of agent that at that particular time is changing its mind // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	double r[NE*N];		// Array to hold talent of each agent
 	double w[NE*N];		// Array to hold wealth of each agent
-	double alpha[NE*N];	// Array to hold contribution coefficient of each agent (contribution == stragety == co-op)
+	double alpha[NE*N];	// Array to hold contribution coefficient of each agent (contribution == strategy == co-op)
 	//double oldalpha[NE*N];	// Array to hold the contribution coefficient (strategy) for each agent from the last timestep
 	int rank[NE*N];		// Ranking array: shows in which order the agents are. 
 				// IMPORTANT CONVENTION: The HIGHER the ORDER of agent, the BETTER the PLACEMENT !!!
@@ -88,7 +87,7 @@ int main() {
 
 	// *********** Initialising the GSL Mersenne twister RNG & a C srand RNG *********** //
 
-    	// GSL Mersenne Twister 19937 RNG
+    // GSL Mersenne Twister 19937 RNG
 	pfile = fopen ("/dev/urandom", "r");
 	//int ir;
 	fread (&seed, sizeof (seed), 1, pfile);	// I added the rand= ... just to not be bothered anymore by the warnings!

@@ -15,18 +15,17 @@ using namespace std;
 /*
 
 Constants::Constants(){
-	N=100; //Number of agents playing the game
-	T=100;//Time at which I want to stop my simulation
-        interval=0.1; //time interval to print my data
-	S=4; //Size of the groups
-	Q=0.4; //Return rate
-	lambda=0.1; //Parameter for the Exponential distribution, the mean
-	mu=1; //Mean of the Gaussian distribution for the talent
-	sigmag=0.22; //Variance sigma of the Gaussian distribution for the talent
-	W0=2; //Initial wealth value
-        Choice = 4; //Indicates the choice of what are we using to rank agents in the groups
-        monincr = 100; //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1 
-        beta = 0.5; // This is the noise parameter in the logit
+	NE= 300; // Number of "societies" in the ensemble
+	N= 100; //Number of agents playing the game
+	T= 35;//Time at which I want to stop my simulation
+	S= 4; //Size of the groups
+	Q= 0.3; //Return rate
+	mu= 1; //Mean of the Gaussian distribution for the talent
+	sigmag= 0.22; //Variance sigma of the Gaussian distribution for the talent
+	W0= 2; //Initial wealth value
+	Choice= 1; //Indicates the choice of what are we using to rank agents in the groups
+    monincr= 100; //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
+    beta= 2; //This is the noise parameter in the logit
 }
 Constants::~Constants(){}
 
@@ -37,7 +36,7 @@ Constants::~Constants(){}
 Constants::Constants(){ //Note that name must be the entire path; i.e. "./config.conf"
 	char line[256];
 	int linenum=0;
-	int count=0, M=13; //M is the amount of parameters I have to give, count will range from 0 to M-1
+	int count=0, M=11; //M is the amount of parameters I have to give, count will range from 0 to M-1
 	double vector[M]; //will store the M parameters
 	FILE *pfile;
 
@@ -56,15 +55,13 @@ Constants::Constants(){ //Note that name must be the entire path; i.e. "./config
 	NE=int(vector[0]); // Number of "societies" in the ensemble
 	N=int(vector[1]); //Number of agents playing the game
 	T=vector[2];//Time at which I want to stop my simulation
-        //interval=vector[2]; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	S=int(vector[4]); //Size of the groups
-	Q=vector[5]; //Return rate
-	//lambda=vector[5]; //Parameter for the Exponential distribution, the mean // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	mu=vector[7]; //Mean of the Gaussian distribution for the talent
-	sigmag=vector[8]; //Variance sigma of the Gaussian distribution for the talent
-	W0=vector[9]; //Initial wealth value
-	Choice=int(vector[10]); //Indicates the choice of what are we using to rank agents in the groups
-        monincr=int(vector[11]); //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
-        beta= vector[13]; //This is the noise parameter in the logit
+	S=int(vector[3]); //Size of the groups
+	Q=vector[4]; //Return rate
+	mu=vector[5]; //Mean of the Gaussian distribution for the talent
+	sigmag=vector[6]; //Variance sigma of the Gaussian distribution for the talent
+	W0=vector[7]; //Initial wealth value
+	Choice=int(vector[8]); //Indicates the choice of what are we using to rank agents in the groups
+    monincr=int(vector[9]); //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
+    beta= vector[10]; //This is the noise parameter in the logit
 }
 Constants::~Constants(){}

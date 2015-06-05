@@ -113,6 +113,7 @@ int main() {
 		filew << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		filew << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		filew << "Time step\tTotal wealth for each 'society'" << endl;	
+		filew << "#" << endl;
 	}
 
 	// The COOPERATION file
@@ -124,6 +125,7 @@ int main() {
 		filec << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		filec << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		filec << "Time step\tAverage co-op/strategy for each 'society'" << endl;	
+		filec << "#" << endl;
 	}
 
 	// The GINI COEF. file
@@ -135,8 +137,8 @@ int main() {
 		fileg << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		fileg << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		fileg << "Time step\tGini coef. for each 'society'" << endl;	
+		fileg << "#" << endl;
 	}
-
 
 	// The TIME file
 	filet.open(filenamet,ios::out|ios::trunc); //Open the time file
@@ -147,6 +149,7 @@ int main() {
 		filet << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		filet << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		filet << "# Time step\tGini coefficient\tGrowth percentage\tAverage cooperation" << endl;
+		filet << "#" << endl;
 	}
 
 	// The TALENT file 
