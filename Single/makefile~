@@ -41,8 +41,9 @@ all: $(PROGRAM)
 
 # Target for cleaning up. 
 clean:	
-		rm $(OBJ)
-		rm $(PROGRAM)
+		rm -rf obj
+		#rm $(OBJ)
+		#rm $(PROGRAM)
 
 # Rule for linking IMPORTANT! The space in front of $(CXX) is a TABULATOR!
 $(PROGRAM): $(OBJ)
