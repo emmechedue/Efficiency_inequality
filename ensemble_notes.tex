@@ -2,6 +2,7 @@
 \usepackage{graphicx}
 \usepackage{amssymb,amsmath}
 \usepackage{hyperref}
+\usepackage{color}
 
 
 \author{Madis Ollikainen}
@@ -10,9 +11,12 @@
 \begin{document}
 
 \maketitle
+\section{Stefano's comment}
+{\color{red}I will write my comments in red, so that you can spot them easily.}
 
 \section{Structure of the joint directory}
 I now made two directories: \emph{Ensemble} and \emph{Single} to hold the files for the ensemble simulations and the single 'society' simulation. Also I used the word 'society' in the code comments for referencing to one entity of the ensemble. Both of the directories have there own \emph{src}, \emph{include} and \emph{obj} directories, as well as a \emph{makefile} and the other extra files. 
+{\color{red}Thanks, very nice. It's much clearer now.}
 
 \section{Make, libs and file names}
 Running \emph{make} in either of the directories should produce a executable named \emph{run\_ensemble} or \emph{run\_single}. Also the file names now have the prefix referring to either \emph{ensemble} or \emph{single}. Even with the synchronous strategy updating the wealth grow with huge speed, so it is still a good idea to use a multi-precision library for the logit probability sampling. Both of the code use MPFR multiprecision library at the moment. For this it is needed to link both MPFR and GMP multi-precision library. You can also change the multi-precision library to GMP or the only BOOST headers CPP\_FLOAT, for that just have a look at \emph{include/mpEXP.h} and uncomment/comment the necessary thing both in the includes and in the \emph{myMP\_float} definition sections. Info about the multi-precision libraries and downloads can be gotten from: 
@@ -22,6 +26,7 @@ Running \emph{make} in either of the directories should produce a executable nam
 \item \url{<http://www.mpfr.org/>}
 \end{itemize}
 Also the configure file has be changed for the ensemble version. It now has an entry NE for the number of 'societies' in the ensemble aka. the ensemble size. And both the ensemble and the single version lack the info about the exponential time sampling (although under the Single directory you can still find the files for the asynchronous strategy updating). 
+{\color{red}Thanks for the explanation, I installed all the libraries, so we can keep using both GMP and MPFR.}
 
 \section{Ensemble outputting}
 The ensemble code writes six output files. 
@@ -77,6 +82,83 @@ Time step & Gini coef. Sc. 1 & Gini coef. Sc. 2 & Gini coef. Sc. 3  & \dots \\
 \end{center}
 
 \end{enumerate}
+
+\section{Stefano's suggestion for outputting}
+{\color{red}\textbf{General comments:}
+\begin{itemize}
+\item If you write the main in the way I suggested, you cannot print anymore ensembles as columns and time as a row. You will have to do it the other way round.
+\item There is no need to print the time steps, because they will be implicit in the number of elements that you write (in this case, the number of elements in a row will indicate how many time steps we had (e.g. for T=35, the length of a row would be 36)
+\end{itemize}
+}
+
+The ensemble code writes six output files. 
+\begin{enumerate}
+\item \emph{parameters.txt} $\rightarrow$ Re-prints the configure file as before. 
+
+\item \emph{talent.txt} $\rightarrow$ Talent for each player in each society, with the structure:
+
+\begin{center}
+\begin{tabular}{c c c c c c}
+Sc.1 Player 1 & Sc.1 Player 2 & Sc.1 Player 3 & Sc.1 Player 4 & \dots \\ 
+Sc.2 Player 1 & Sc.2 Player 2 & Sc.2 Player 3 & Sc.2 Player 4 & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &   
+\end{tabular} 
+\end{center}
+
+
+\item \emph{time.txt} $\rightarrow$ Ensemble averages at each time step, with the structure:
+{\color{red}You won't be able to take averages in the main file anymore (due to the lack of saving all the data at the same point). So there is no need for a time file here. The averages will be taken during the analysis phase.}
+
+\item \emph{wealth.txt} $\rightarrow$ Total wealth for each society at each time step, with the structure:
+{\color{red}again, invert rows and columns and no time}
+
+\begin{center}
+\begin{tabular}{c c c c c}
+Total wealth Sc. 1 at time 0 & Total wealth Sc. 1 at time 1  & Total wealth Sc. 1 at time 2   & \dots \\
+Total wealth Sc. 2 at time 0 & Total wealth Sc. 2 at time 1  & Total wealth Sc. 2 at time 2   & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &
+\end{tabular} 
+\end{center}
+
+\item \emph{cooperation.txt} $\rightarrow$ Average cooperation/strategy for each society at each time step, with the structure:
+{\color{red}again, invert rows and columns and no time}
+
+\begin{center}
+\begin{tabular}{c c c c c}
+Avg-coop Sc. 1 at time 0 & Avg-coop Sc. 1 at time 1  & Avg-coop Sc. 1 at time 2   & \dots \\
+Avg-coop Sc. 2 at time 0 & Avg-coop Sc. 2 at time 1  & Avg-coop Sc. 2 at time 2   & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &
+\end{tabular} 
+\end{center}
+
+\item \emph{GiniCoef.txt} $\rightarrow$ Gini coefficient for each society at each time step, with the structure:
+
+{\color{red}again, invert rows and columns and no time}
+
+\begin{center}
+\begin{tabular}{c c c c c}
+Gini-coeff. Sc. 1 at time 0 & Gini-coeff. Sc. 1 at time 1  & Gini-coeff. Sc. 1 at time 2   & \dots \\
+Gini-coeff. Sc. 2 at time 0 & Gini-coeff. Sc. 2 at time 1  & Gini-coeff. Sc. 2 at time 2   & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &
+\end{tabular}
+\end{center} 
+
+\item {\color{red}\emph{Efficiency.txt} $\rightarrow$ Let's compute the efficiency in the c file instead of computing it in Python. We can and it will be faster.
+
+Remember, efficiency is defined as  $\frac{newwealth - oldwealth}{oldwealth}$}
+
+Structure:
+\begin{center}
+\begin{tabular}{c c c c c}
+Eff. Sc. 1 at time 0 & Eff. Sc. 1 at time 1  & Eff. Sc. 1 at time 2   & \dots \\
+Eff. Sc. 2 at time 0 & Eff. Sc. 2 at time 1  & Eff. Sc. 2 at time 2   & \dots \\
+\vdots & \vdots &  \vdots &  \vdots &
+\end{tabular} 
+\end{center}
+
+
+\end{enumerate}
+
 
 \section{Analysis \& plotting}
 No analysis nor plotting tool is yet available for the ensemble version. Do you have any specific ideas in mind, which kinds of plot would you like to get? Or maybe you think that for the ensemble version the plots will be straight forward from the output data and no special script is necessary? Also, would you like to change anything in the outputting or add anything?
