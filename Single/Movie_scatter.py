@@ -63,6 +63,7 @@ timepoints=T  # Here I compute how many steps I have
 t, c_average= np.loadtxt("./time1.txt", usecols=(0,3), unpack=True) #Here I load the time and the average cooperation
 w_table=np.loadtxt("./wealth1.txt")
 c_table=np.loadtxt("./cooperation1.txt")
+r_table=np.loadtxt("./talent1.txt", usecols=(1,), unpack=True)
 #**************************************************************************************
 
 
@@ -75,17 +76,26 @@ for i in range(timepoints+1): #It is +1 because I have the 0th time step
 	
 	average = np.mean(w_table[i]) #This is the average wealth at time i
 		
+	# Coloring schema info
+	color = r_table
+	rmax = np.amax(r_table)
+	rmin = np.amin(r_table)
+	
+	
 	# The actual plot
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
-	ax.scatter(c_table[i], w_table[i], s = 20,marker='o', vmin=0, vmax=1)
+	lll=ax.scatter(c_table[i], w_table[i], c= color, s = 20,marker='o', vmin=rmin, vmax=rmax)
 	plt.title("Scatter plot of wealth and cooperation in case "+legend1+" is rewarded")
 	plt.ylabel('Wealth')
 	plt.xlabel('Percentage of contribution')
 	plt.plot(c_average[i],average, 'k_',ms=16,mew=3)
 	plt.plot(c_average[i],average, 'k|',ms=16,mew=3)
+	cbar=plt.colorbar(lll)
+	cbar.set_label('Talent', rotation=270)
 	#ax.set_ylim([0,1])
-	ax.set_xlim([0,1])	
+	ax.set_xlim([0,1])
+	plt.tight_layout()
 	
 	# save plot as png file
 	if i<10: ending = '00' + str(i)
@@ -111,6 +121,7 @@ os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts
 t, c_average= np.loadtxt("./time2.txt", usecols=(0,3), unpack=True) #Here I load the time and the average cooperation
 w_table=np.loadtxt("./wealth2.txt")
 c_table=np.loadtxt("./cooperation2.txt")
+r_table=np.loadtxt("./talent2.txt", usecols=(1,), unpack=True)
 #**************************************************************************************
 
 
@@ -123,17 +134,26 @@ for i in range(timepoints+1): #It is +1 because I have the 0th time step
 	
 	average = np.mean(w_table[i]) #This is the average wealth at time i
 		
+	# Coloring schema info
+	color = r_table
+	rmax = np.amax(r_table)
+	rmin = np.amin(r_table)
+	
+	
 	# The actual plot
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
-	ax.scatter(c_table[i], w_table[i], s = 20,marker='o', vmin=0, vmax=1)
+	lll=ax.scatter(c_table[i], w_table[i], c= color, s = 20,marker='o', vmin=rmin, vmax=rmax)
 	plt.title("Scatter plot of wealth and cooperation in case "+legend2+" is rewarded")
 	plt.ylabel('Wealth')
 	plt.xlabel('Percentage of contribution')
 	plt.plot(c_average[i],average, 'k_',ms=16,mew=3)
 	plt.plot(c_average[i],average, 'k|',ms=16,mew=3)
+	cbar=plt.colorbar(lll)
+	cbar.set_label('Talent', rotation=270)
 	#ax.set_ylim([0,1])
-	ax.set_xlim([0,1])	
+	ax.set_xlim([0,1])
+	plt.tight_layout()
 	
 	# save plot as png file
 	if i<10: ending = '00' + str(i)
@@ -158,6 +178,7 @@ os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts
 t, c_average= np.loadtxt("./time3.txt", usecols=(0,3), unpack=True) #Here I load the time and the average cooperation
 w_table=np.loadtxt("./wealth3.txt")
 c_table=np.loadtxt("./cooperation3.txt")
+r_table=np.loadtxt("./talent3.txt", usecols=(1,), unpack=True)
 #**************************************************************************************
 
 
@@ -170,17 +191,26 @@ for i in range(timepoints+1): #It is +1 because I have the 0th time step
 	
 	average = np.mean(w_table[i]) #This is the average wealth at time i
 		
+	# Coloring schema info
+	color = r_table
+	rmax = np.amax(r_table)
+	rmin = np.amin(r_table)
+	
+	
 	# The actual plot
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
-	ax.scatter(c_table[i], w_table[i], s = 20,marker='o', vmin=0, vmax=1)
+	lll=ax.scatter(c_table[i], w_table[i], c= color, s = 20,marker='o', vmin=rmin, vmax=rmax)
 	plt.title("Scatter plot of wealth and cooperation in case "+legend3+" is rewarded")
 	plt.ylabel('Wealth')
 	plt.xlabel('Percentage of contribution')
 	plt.plot(c_average[i],average, 'k_',ms=16,mew=3)
 	plt.plot(c_average[i],average, 'k|',ms=16,mew=3)
+	cbar=plt.colorbar(lll)
+	cbar.set_label('Talent', rotation=270)
 	#ax.set_ylim([0,1])
-	ax.set_xlim([0,1])	
+	ax.set_xlim([0,1])
+	plt.tight_layout()	
 	
 	# save plot as png file
 	if i<10: ending = '00' + str(i)
@@ -207,6 +237,7 @@ os.system("mencoder -really-quiet -mc 0 -noskip -skiplimit 0 -ovc lavc -lavcopts
 t, c_average= np.loadtxt("./time4.txt", usecols=(0,3), unpack=True) #Here I load the time and the average cooperation
 w_table=np.loadtxt("./wealth4.txt")
 c_table=np.loadtxt("./cooperation4.txt")
+r_table=np.loadtxt("./talent4.txt", usecols=(1,), unpack=True)
 #**************************************************************************************
 
 
@@ -219,17 +250,26 @@ for i in range(timepoints+1): #It is +1 because I have the 0th time step
 	
 	average = np.mean(w_table[i]) #This is the average wealth at time i
 		
+	# Coloring schema info
+	color = r_table
+	rmax = np.amax(r_table)
+	rmin = np.amin(r_table)
+	
+	
 	# The actual plot
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
-	ax.scatter(c_table[i], w_table[i], s = 20,marker='o', vmin=0, vmax=1)
+	lll=ax.scatter(c_table[i], w_table[i], c= color, s = 20,marker='o', vmin=rmin, vmax=rmax)
 	plt.title("Scatter plot of wealth and cooperation in case "+legend4+" is rewarded")
 	plt.ylabel('Wealth')
 	plt.xlabel('Percentage of contribution')
 	plt.plot(c_average[i],average, 'k_',ms=16,mew=3)
 	plt.plot(c_average[i],average, 'k|',ms=16,mew=3)
+	cbar=plt.colorbar(lll)
+	cbar.set_label('Talent', rotation=270)
 	#ax.set_ylim([0,1])
-	ax.set_xlim([0,1])	
+	ax.set_xlim([0,1])
+	plt.tight_layout()
 	
 	# save plot as png file
 	if i<10: ending = '00' + str(i)
