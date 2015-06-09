@@ -88,7 +88,7 @@ plt.plot(data1[0], data1[2])
 plt.plot(data1[0], data2[2])
 plt.plot(data1[0], data3[2])
 plt.plot(data1[0], data4[2])
-plt.title("Total wealth (?) for different ranking systems")
+plt.title("Growth (efficiency) for different ranking systems")
 legend1=r'$\alpha_i  w_i  r_i = O_i$'
 legend2=r'$\alpha_i  w_i$'
 legend3=r'$\alpha_i  r_i$'
