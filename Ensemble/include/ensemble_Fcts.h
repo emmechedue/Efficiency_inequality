@@ -135,6 +135,8 @@ double sumofvector(double *a, int N){
     return res;
 }
 
+
+
 /*This function just returns the sum over the vector of length n*/
 double sumofSubVector(double *a, int begin, int end){
 
@@ -361,7 +363,7 @@ void printstuffsingleloop(ofstream& filet,ofstream& filew, ofstream& filec ,doub
 
 
 // ----- Ensemble print function ----- // 
-
+/*
 void ensemblePrint(ofstream& filet, ofstream& filew, ofstream& filec, ofstream& fileg, double t, double *eff, double *tot_w, double *w, double *alpha, Constants cons, int N, int NE){
 
 	double* Gini = new double[NE]{};// Gini for each society
@@ -430,6 +432,77 @@ void ensemblePrint(ofstream& filet, ofstream& filew, ofstream& filec, ofstream& 
 	// De-allocate memory
 	delete[] Gini;
 	delete[] Coop;
+
+	// End the print function
+	return;
+}
+*/
+
+void ensemblePrint(ofstream& fileEf, ofstream& filew, ofstream& filec, ofstream& fileg, double t, double eff, double tot_w, double *w, double *alpha, Constants cons, int N){
+
+	double Gini = 0.0;		// Gini for each society
+	double Coop = 0.0;		// Average co-op for each society
+	//double avg_Gini = 0.0; 		// Ensemble average index of inequality. Inequality is computed as the gini coefficient (see note in the fcts)
+	//double avg_Coop = 0.0; 		// Ensemble average average_level_of_cooperation at time step t   
+	//double avg_totWealth = 0.0;	// Ensemble average of total wealth 
+	//double avg_eff = 0.0;		// Ensemble average of growth %
+	        
+
+	// Calculate the Gini coef & Co-op and their and total wealth & growth % ensemble averages //
+
+	// Loop over all societies  	
+	//for (int k=0; k<NE; k++){
+
+		// And calculate the average co-op for k-th 'society'
+		for (int i=0; i<N; i++){
+			Coop += alpha[i];
+		}
+		// Arithmetic average of the co-op
+		Coop = Coop/N;
+
+		// Ensemble average of co-op
+		//avg_Coop += Coop[k];
+
+		// Gini coef
+		Gini = computegini(w, cons);
+		//avg_Gini += Gini[k];
+
+		// Ensemble average of total Wealth 
+		//avg_totWealth += tot_w[k];
+
+		// Ensemble average of growth %
+		//avg_eff += eff[k];
+	//}
+
+	// Arithmetic average for ensemble averages
+	//avg_Gini = avg_Gini/NE;
+	//avg_Coop = avg_Coop/NE;
+	//avg_totWealth = avg_totWealth/NE;
+	//avg_eff = avg_eff/NE;
+	
+	// Printing //
+
+	// Ensemble averages (time file): time step, total wealth, growth %, Gini coef, average Co-op.  
+    	//filet << left << setw(6) << t << "\t" << left << setw(12) << avg_totWealth << "\t" << left << setw(12) << avg_eff << "\t";
+	//filet << left << setw(12) << avg_Gini << "\t" << left << setw(12) << avg_Coop << endl;
+
+	// TotWealth, Gini, avg Coop for each society
+	//filew << left << setw(6) << t;
+	//filec << left << setw(6) << t;
+	//fileg << left << setw(6) << t;	
+	//for (int k=0; k<NE; k++){
+		filew  << left << setw(12) << tot_w << "\t";
+		filec  << left << setw(12) << Coop << "\t";
+		fileg  << left << setw(12) << Gini << "\t";
+		fileEf  << left << setw(12) << eff << "\t";
+	//}
+	//filew << endl;
+	//filec << endl;
+	//fileg << endl; 
+
+	// De-allocate memory
+	//delete[] Gini;
+	//delete[] Coop;
 
 	// End the print function
 	return;
