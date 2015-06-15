@@ -46,14 +46,6 @@ int main() {
 	int NE = cons.NE;	// Number of "societies" in the ensemble
 	int N = cons.N;		// Number of agents in one "society" 
 	int M; 			// Number of groups
-/*	double r[NE*N];		// Array to hold talent of each agent
-	double w[NE*N];		// Array to hold wealth of each agent
-	double alpha[NE*N];	// Array to hold contribution coefficient of each agent (contribution == strategy == co-op)
-	//double oldalpha[NE*N];	// Array to hold the contribution coefficient (strategy) for each agent from the last timestep
-	int rank[NE*N];		// Ranking array: shows in which order the agents are. 
-				// IMPORTANT CONVENTION: The HIGHER the ORDER of agent, the BETTER the PLACEMENT !!!
-	double O[N];		// Array to hold the output for each turn !!! THIS DOES NOT NEED MORE THEN N ENTRIES !!!
-*/
 	double r[N];		// Array to hold talent of each agent
 	double w[N];		// Array to hold wealth of each agent
 	double alpha[N];	// Array to hold contribution coefficient of each agent (contribution == strategy == co-op)
@@ -65,26 +57,14 @@ int main() {
 
 
 	// Supporting variables for different purposes 
-	//double oldt, t; 	// The time and an time index variable to keep track of time
-	//double oldt;		// The oldtime // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	int t;
-	//int enne; 		// Int variable that I need in a time thing // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	//int i; 			// Support variable 
-	//double ranvar;	// A random variable // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	//double eff[NE];		// These are to print the efficiency and then renormalize the wealth.
 	double eff;		// These are to print the efficiency and then renormalize the wealth.
-	//double oldeff[NE];	//  
-				// Here the efficiency is defined as percentage growth
-/*	double wealth[NE];  	// Wealth is the total wealth at every time step for each society
-	double oldwealth[NE];	// Oldwealth is a support variable I need to compute the efficiency	
-*/	double wealth;  	// Wealth is the total wealth at every time step for each society
+	double wealth;  	// Wealth is the total wealth at every time step for each society
 	double oldwealth;	// Oldwealth is a support variable I need to compute the efficiency
 		
-	//int counteff;		// This I need to make proper averages of the efficiency	// !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 
 	// ofstream for outputing and output files
 	ofstream filep;		// Parameter output stream 
-//	ofstream filet;		// Main/time output stream
 	ofstream filew;		// Wealth output stream
 	ofstream filec;		// Cooperation output stream
 	ofstream filer;		// Talent output stream
@@ -92,7 +72,6 @@ int main() {
 	ofstream fileEf;		// Efficientcy output stream
 	
 	const char filenamep[]="parameters.txt";	// File to hold the simulation input parameters	
-	//const char filenamet[]="time.txt";		// File to hold the ensemble averages for each timestep: en.avg TotWealth, Growth%, Gini and avg.co-op
 	const char filenamew[]="wealth.txt"; 		// File to hold the total wealth for each ensemble for each timestep
 	const char filenamec[]="cooperation.txt";	// File to hold the average co-op in each "society" for each timestep
 	const char filenamer[]="talent.txt";		// File to hold the talent for each individual in each society (rows: individuals, columns: societies)
@@ -170,18 +149,6 @@ int main() {
 		fileg << "#" << endl;
 	}
 
-	/*// The TIME file
-	filet.open(filenamet,ios::out|ios::trunc); //Open the time file
-	if(filet.is_open()){
-		filet << "# Ensemble averages at each time step for the simulation Efficiency_inequality with:"<<endl;
-		filet << "#N=" << cons.N << " T=" << cons.T  << " S=";
-		filet << cons.S << " Q=" << cons.Q <<  " mu=" << cons.mu;
-		filet << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
-		filet << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
-		filet << "# Time step\tGini coefficient\tGrowth percentage\tAverage cooperation" << endl;
-		filet << "#" << endl;
-	}*/
-
 	// The TALENT file 
 	filer.open(filenamer,ios::out|ios::trunc); //Open the talent file
 	if(filer.is_open()){
@@ -221,66 +188,33 @@ int main() {
 
 		// FILL THE VECTORS OF TALENT , WEALTH AND RANKING AND INITIALIZE EVERYTHING
 		t=0;			
-	
-	
-		// The arrays describing agents	& eff
-		//for(int k=0; k<NE; k++){
+
 		
 			eff = 0.0;
-			//oldeff[k] = 0.0;
+			
 	
 			for(int i=0; i<N; i++){
 		
-				// Index of the agent
-				//int ID = k*N + i;
-	
-				// Initial wealth W0 is equal for all
-		    		//w[ID]=cons.W0;
 				w[i]=cons.W0;		
 	
 				// Intial rank is efectivly random
-		    		//rank[ID]=i;
-				rank[i]=i;		
+		    		rank[i]=i;		
 				
 				// Gaussian distributed talent. Have to add the mean of the gaussian because the generator has mean zero.  
-		    		//r[ID]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
-				r[i]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
+		    		r[i]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
 	
 				// All initial trategies are full defection = contribution of all agents is 0
-		    		//alpha[ID]=0; 
 				alpha[i]=0;
 			}
-		//}
 	
 		// Print out the talent for each player 
 		for(int i=0; i<N; i++){
-			//for(int k=0; k<NE; k++){
-				//int ID = k*NE + i;		
-				//filer << r[ID] << "\t" ;
-				//filer << left << setw(8) << r[ID] << "\t" ;
-				filer << left << setw(8) << r[i] << "\t" ;
-			//}
-			
+
+			filer << left << setw(8) << r[i] << "\t" ;
+				
 		}
 		filer << endl;	
 	
-		// Close the talent file as it is not used anymore
-		//filer.close();
-	
-		// Renormalise wealth w[]
-		//renormalizearray(w,cons.N);
-	
-		//for(int k=0; k<NE; k++){
-			
-		/*	// Total initial wealth. I don't really need to initialize this, but it's better anyway
-			int begin = N*k;
-			int end = N*(k+1) - 1;
-			wealth[k] = sumofSubVector(w, begin, end);
-	
-			//It is important to initialize this!
-			oldwealth[k] = wealth[k]; 
-		//}
-*/
 		// Total initial wealth. I don't really need to initialize this, but it's better anyway
 		wealth = sumofvector(w, N);
 
@@ -314,29 +248,14 @@ int main() {
 			}
 			
 			// *** Loop over all NE societies *** //
-			//for (int k=0; k<NE; k++){
-				/*
-				// ** Subarrays corresponding to k-th society ** //
-				double alpha_k[N];
-				FillSubArray(alpha, alpha_k, k, N);			
-				double w_k[N];
-				FillSubArray(w, w_k, k, N);
-				double r_k[N];
-				FillSubArray(r, r_k, k, N);
-				int rank_k[N];
-				FillSubArray(rank, rank_k, k, N);
-			*/	
+
 			
 				// ** Update strategy for each player in each in k-th society ** //
 				for (int i=0; i<N; i++){
 					//alpha[k*N + i] = NewStrategy(i, alpha_k, w_k, r_k, cons, gslpointer);
 					alpha[i] = NewStrategy(i, oldalpha, w, r, cons, gslpointer);
 				}
-	
-				// ** Now !!! CHANGE/UPDATE !!! the values in !!! alpha_k !!! ** //
-				/*for (int i=0; i<N; i++){
-					alpha_k[i] = alpha[k*N + i];
-				}*/
+
 			
 				// ** "Play the game" with the new strategys ** //
 	
@@ -349,25 +268,11 @@ int main() {
 				formgroups(w, alpha, O, rank, cons, M); 
 	
 				// Here I compute the total amount of wealth. And the efficiency, which is defined as the percentage increase of wealth.
-/*				wealth[k] = sumofvector(w_k, N);
-				eff[k] = wealth[k] - oldwealth[k];
-				eff[k] = eff[k]/oldwealth[k]; // I separate those 2 because in this way it should be better for numerical errors, right?
-				oldwealth[k] = wealth[k];		 		
-				//oldeff[k] = eff[k];
-*/
 				wealth = sumofvector(w, N);
 				eff = wealth - oldwealth;
 				eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
 				oldwealth = wealth;		 		
-				//oldeff[k] = eff[k];
-	
-				/*// ** UPDATE the !! BigArrays !! ** //
-				for (int i=0; i<N; i++){
-					rank[k*N + i] = rank_k[i];
-					w[k*N + i] = w_k[i];
-				}*/
-			
-			//}
+
 	
 			// *** Outputting *** // 
 	
@@ -384,7 +289,7 @@ int main() {
 	
 	
 			// Print the time to commandline for checking the runtime //
-			cout << "Society nr " << k +1 << ", timestep "<< t << endl; 		
+			cout << "Society nr " << k + 1 << ", timestep "<< t << endl; 		
 	
 	
 		}
