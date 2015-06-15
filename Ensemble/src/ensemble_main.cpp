@@ -106,7 +106,7 @@ int main() {
 		filew << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		filew << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//filew << "Time step\tTotal wealth for each 'society'" << endl;
-		filew << "# Total wealth -> Rows: 'societies'\tColumns: timesteps" << endl;	
+		filew << "# Total wealth -> Rows: timesteps\tColumns: 'societies'" << endl;	
 		filew << "#" << endl;
 	}
 
@@ -119,7 +119,7 @@ int main() {
 		fileEf << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		fileEf << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//filew << "Time step\tTotal wealth for each 'society'" << endl;
-		fileEf << "# Efficiency -> Rows: 'societies'\tColumns: timesteps" << endl;	
+		fileEf << "# Efficiency -> Rows: timesteps\tColumns: 'societies'" << endl;	
 		filew << "#" << endl;
 	}
 
@@ -132,7 +132,7 @@ int main() {
 		filec << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		filec << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//filec << "Time step\tAverage co-op/strategy for each 'society'" << endl;	
-		filec << "# Average strategy/co-op -> Rows: 'societies'\tColumns: timesteps" << endl;		
+		filec << "# Average strategy/co-op -> Rows: timesteps\tColumns: 'societies'" << endl;		
 		filec << "#" << endl;
 	}
 
@@ -145,7 +145,7 @@ int main() {
 		fileg << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		fileg << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//fileg << "Time step\tGini coef. for each 'society'" << endl;
-		fileg << "# Gini coef -> Rows: 'societies'\tColumns: timesteps" << endl;	
+		fileg << "# Gini coef -> Rows: timesteps\tColumns: 'societies'" << endl;	
 		fileg << "#" << endl;
 	}
 
