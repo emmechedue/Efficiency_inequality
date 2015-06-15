@@ -384,7 +384,7 @@ int main() {
 	
 	
 			// Print the time to commandline for checking the runtime //
-			cout << "Society nr " << k +1 << ", timestep "<< t << endl; 		
+			cout << "Society nr " << k + 1 << ", timestep "<< t << endl; 		
 	
 	
 		}
