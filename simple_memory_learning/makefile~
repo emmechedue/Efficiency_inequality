@@ -27,7 +27,7 @@ CXXFLAGS = -Wall -std=c++11  $(LDFLAGS) $(INCFLAGS)
 #####################################################
 
 # The simu type
-TYPE = single
+TYPE = sml
 
 # Declare the name of our program 
 #PROGRAM = inequality_inefficiency_logit_single_loop

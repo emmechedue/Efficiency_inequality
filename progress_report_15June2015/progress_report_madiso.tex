@@ -1,0 +1,318 @@
+\documentclass{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage[us]{datetime}
+\usepackage{graphicx}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[font=small,labelfont=bf]{subcaption}
+\usepackage{listings}
+\usepackage{color}
+\renewcommand{\lstlistingname}{Code}
+\captionsetup[subfigure]{font=footnotesize}
+\setlength{\parindent}{0in}
+
+
+\author{Madis Ollikainen}
+\title{Progress report: \\ Simulations with simple learning routine}
+
+\begin{document}
+
+\maketitle
+
+%% For Stefanos comments %% 
+%\section{Stefano's comment}
+%{\color{red}I will write my comments in red, so that you can spot them easily.}
+
+\section{Learning schema \& strategy updating}
+I took the code for the single loop simulation and changed the strategy updating mechanism, such that it doesn't any more use Nash equilibrium, but rather a crude schema trying to imitate learning. Basically the agents now have a memory and after each turn they assign points to the strategy they used. These points are used in the next round for choosing a new strategy.
+
+\vspace{10pt}
+
+I introduced an array of doubles called \emph{memory}, that holds a value for each possible strategies for each agent. Thus the array is of length $N_{agents} \times N_{strategies}$. If we wish to make simulations with a lot of agents using a fine grained semi-smooth strategy (contribution) interval, than this array might become to big. But at the moment it was OK for my laptop and had plenty of memory for more. 
+
+\vspace{10pt}
+
+All entries in \emph{memory} are initialised to $1$. After each round $t$ each agents $i$ updates its memory entry $M_ij$ for the strategy $j$ that they used in that round. The update $M_{ij}(t) \rightarrow M_{ij}(t+1)$ is done as
+\[
+M_{ij}(t+1) = M_{ij}(t)\left(1 + \xi\frac{w_i(t) - w_i(t-1)}{w_i(t-1)} \right), 
+\]   
+where $w_i(t)$ is the wealth of agent $i$ after round $t$ and $\xi$ is a pre-defined learning factor, which can be set in the configuration file under the \emph{mUpDate} variable.  
+
+\vspace{10pt}
+
+Before each round the strategies of all agents are updated using the entries in the array memory array $M$. The updating schema has the same probabilistic structure as it had in the previous simulations. The probabilities of each strategy $j$ for agent $i$ are calculated as
+\[
+p_{ij} = \frac{e^{\beta M_{ij}}}{\sum_{k}e^{\beta M_{ik}}}.
+\]
+
+\section{Test simulations}
+\subsection{Setup}
+I ran three test simulation with $N_{agents} = 5000$ and $N_{strategies} = 101$ and $\xi = {1.0, 0.1, 0.01}$. Each simulation lasted $t=50$ time steps (using $\xi=1.0$ the exponents exploded again after $70$ or so time steps). For comparison I also ran a simulation with the Nash equilibrium strategy changing. But as that simulation schema take a lot longer to calculate, then I used just $N_{agents}=500$ and also only for $t=30$ time steps, as after that the exponent might explod. Other parameter were the same as in the \emph{dummy.conf} (in which ever directory you look ...).   
+
+\subsection{Results: plots}
+
+%% The Co-operation %% 
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_cooperation}.pdf}
+\caption{Nash eq. comparison}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_cooperation}.pdf}
+\caption{$\xi=1.0$}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_cooperation}.pdf}
+\caption{$\xi=0.1$}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_cooperation}.pdf}
+\caption{$\xi=0.01$}
+\end{subfigure}
+
+\caption{Average co-operation levels for different ranking systems for different simulation setups.}
+\end{figure}
+
+%% The Growth of wealth %% 
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_growth}.pdf}
+\caption{Nash eq. comparison}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_growth}.pdf}
+\caption{$\xi=1.0$}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_growth}.pdf}
+\caption{$\xi=0.1$}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_growth}.pdf}
+\caption{$\xi=0.01$}
+\end{subfigure}
+
+\caption{Growth of wealth of the whole 'society' for different ranking systems for different simulation setups.}
+\end{figure}
+
+
+%% The Gini coef. %% 
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_gini}.pdf}
+\caption{Nash eq. comparison}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_gini}.pdf}
+\caption{$\xi=1.0$}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_gini}.pdf}
+\caption{$\xi=0.1$}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_gini}.pdf}
+\caption{$\xi=0.01$}
+\end{subfigure}
+
+\caption{Gini coefficient for different ranking systems for different simulation setups.}
+\end{figure}
+
+%% Scatter plots for the final time step %%
+
+% Nash eq. comparison
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_scatter_ranking_1_030}.png}
+\caption{Ranking 1}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_scatter_ranking_2_030}.png}
+\caption{Ranking 2}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_scatter_ranking_3_030}.png}
+\caption{Ranking 3}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{single_compare_scatter_ranking_4_030}.png}
+\caption{Ranking 4}
+\end{subfigure}
+
+\caption{Scatter plots for the final time step for Nash eq. comparison.}
+\end{figure}
+
+% xi = 1.0
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_scatter_ranking_1_050}.png}
+\caption{Ranking 1}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_scatter_ranking_2_050}.png}
+\caption{Ranking 2}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_scatter_ranking_3_050}.png}
+\caption{Ranking 3}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_1.0_scatter_ranking_4_050}.png}
+\caption{Ranking 4}
+\end{subfigure}
+
+\caption{Scatter plots for the final time step for $\xi=1.0$}
+\end{figure}
+
+% xi = 0.1
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_scatter_ranking_1_050}.png}
+\caption{Ranking 1}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_scatter_ranking_2_050}.png}
+\caption{Ranking 2}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_scatter_ranking_3_050}.png}
+\caption{Ranking 3}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.1_scatter_ranking_4_050}.png}
+\caption{Ranking 4}
+\end{subfigure}
+
+\caption{Scatter plots for the final time step for $\xi=0.1$}
+\end{figure}
+
+% xi = 0.1
+\begin{figure}[h]
+\centering
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_scatter_ranking_1_050}.png}
+\caption{Ranking 1}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_scatter_ranking_2_050}.png}
+\caption{Ranking 2}
+\end{subfigure}
+
+\bigskip 
+
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_scatter_ranking_3_050}.png}
+\caption{Ranking 3}
+\end{subfigure}%
+%
+\hfill
+%
+\begin{subfigure}[t]{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{{mUpDate_0.01_scatter_ranking_4_050}.png}
+\caption{Ranking 4}
+\end{subfigure}
+
+\caption{Scatter plots for the final time step for $\xi=0.01$}
+\end{figure}
+
+\end{document}

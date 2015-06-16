@@ -95,8 +95,8 @@ legend3=r'$\alpha_i  r_i$'
 legend4=r'$\alpha_i$'
 plt.legend((legend1,legend2,legend3,legend4),loc=4)
 plt.xlabel('time')
-plt.ylabel(r'Relative Growth, $\left(w[t]-w[t-1]\right)/w[t-1]$')
-#plt.ylabel(r'Total wealth')
+#plt.ylabel(r'Relative Growth, $\left(w[t]-w[t-1]\right)/w[t-1]$')
+plt.ylabel(r'Total wealth')
 plt.tight_layout()
 plt.savefig('growth.pdf',dpi=100)
 close()
