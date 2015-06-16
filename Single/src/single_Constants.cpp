@@ -37,7 +37,7 @@ Constants::~Constants(){}
 Constants::Constants(){ //Note that name must be the entire path; i.e. "./config.conf"
 	char line[256];
 	int linenum=0;
-	int count=0, M=12; //M is the amount of parameters I have to give, count will range from 0 to M-1
+	int count=0, M=10; //M is the amount of parameters I have to give, count will range from 0 to M-1
 	double vector[M]; //will store the M parameters
 	FILE *pfile;
 
@@ -55,15 +55,13 @@ Constants::Constants(){ //Note that name must be the entire path; i.e. "./config
 	//Here I cast when I actually have integers
 	N=int(vector[0]); //Number of agents playing the game
 	T=vector[1];//Time at which I want to stop my simulation
-        //interval=vector[2]; // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	S=int(vector[3]); //Size of the groups
-	Q=vector[4]; //Return rate
-	//lambda=vector[5]; //Parameter for the Exponential distribution, the mean // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
-	mu=vector[6]; //Mean of the Gaussian distribution for the talent
-	sigmag=vector[7]; //Variance sigma of the Gaussian distribution for the talent
-	W0=vector[8]; //Initial wealth value
-	Choice=int(vector[9]); //Indicates the choice of what are we using to rank agents in the groups
-        monincr=int(vector[10]); //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
-        beta= vector[11]; //This is the noise parameter in the logit
+	S=int(vector[2]); //Size of the groups
+	Q=vector[3]; //Return rate
+	mu=vector[4]; //Mean of the Gaussian distribution for the talent
+	sigmag=vector[5]; //Variance sigma of the Gaussian distribution for the talent
+	W0=vector[6]; //Initial wealth value
+	Choice=int(vector[7]); //Indicates the choice of what are we using to rank agents in the groups
+    monincr=int(vector[8]); //Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
+    beta= vector[9]; //This is the noise parameter in the logit
 }
 Constants::~Constants(){}
