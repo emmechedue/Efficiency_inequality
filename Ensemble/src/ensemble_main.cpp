@@ -110,17 +110,17 @@ int main() {
 		filew << "#" << endl;
 	}
 
-	// The WEALTH file 	
+	// The EFFICIENCY file 	
 	fileEf.open(filenameEf,ios::out|ios::trunc); 
-	if(filew.is_open()){
+	if(fileEf.is_open()){
 		fileEf << "# Efficiency of each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
 		fileEf << "#N=" << cons.N << " T="<<cons.T  << " S=";
 		fileEf << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
 		fileEf << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		fileEf << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
-		//filew << "Time step\tTotal wealth for each 'society'" << endl;
+		//fileEf << "Time step\tTotal wealth for each 'society'" << endl;
 		fileEf << "# Efficiency -> Rows: timesteps\tColumns: 'societies'" << endl;	
-		filew << "#" << endl;
+		fileEf << "#" << endl;
 	}
 
 	// The COOPERATION file
