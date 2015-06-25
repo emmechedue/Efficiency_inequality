@@ -20,8 +20,8 @@
 #include<gsl/gsl_randist.h> //Needed for the beta pdf
 
 // My includes
-#include "single_Constants.h"
-#include "single_Fcts.h"
+#include "sml_Constants.h"
+#include "sml_Fcts.h"
 
 
 using namespace std;
@@ -50,11 +50,18 @@ int main() {
 	//int k; 		// Index of agent that at that particular time is changing its mind // !!! NOT NECESSARY IN THIS NEW SCHEMA !!! 
 	double r[cons.N];	// Array to hold talent of each agent
 	double w[cons.N];	// Array to hold wealth of each agent
+	double OLDw[cons.N];	// Array to hold OLDwealth of each agent
 	double alpha[cons.N];	// Array to hold contribution coefficient of each agent (contribution == stragety)
-	double oldalpha[cons.N];// Array to hold the contribution coefficient (strategy) for each agent from the last timestep
 	int rank[cons.N];	// Ranking array: shows in which order the agents are. 
 				// IMPORTANT CONVENTION: The HIGHER the ORDER of agent, the BETTER the PLACEMENT !!!
 	double O[cons.N];	// Array to hold the output for each turn 
+
+	// Variables for the memory thingy
+	int N_alpha = cons.monincr + 1; 		// The number of different strategies possible
+	double alpha_interval = 1.0/cons.monincr;	// The interval lenght of the contribution discritasation
+	double *memory = new double [cons.N*N_alpha]; 	// The array for the memory
+	//int current_alpha[cons.N];			// The array to hold the index of the currently used strategies.
+	//double mUpDate=cons.mUpDate;			// The coef. for memory update 
 
 	// Supporting variables for different purposes 
 	//double oldt, t; 	// The time and an time index variable to keep track of time
@@ -72,12 +79,14 @@ int main() {
 	ofstream filew;		// Wealth output stream
 	ofstream filec;		// Cooperation output stream
 	ofstream filer;		// Talent output stream
+	ofstream filem;		// Memory output stream
 	
 	const char filenamep[]="parameters.txt";	// Parameter output filename	
 	const char filenamet[]="time.txt";		// Main/time output stream
 	const char filenamew[]="wealth.txt"; 		// Wealth output filename
 	const char filenamec[]="cooperation.txt";	// Cooperation output filename
 	const char filenamer[]="talent.txt";		// Talent output filename
+	const char filenamem[]="memory.txt";		// Memory output filename
 
 
 
@@ -106,13 +115,22 @@ int main() {
 	// The WEALTH file 	
 	filew.open(filenamew,ios::out|ios::trunc); 
 	if(filew.is_open()){
-		filew << "#Wealth at each time step for the simulation Efficiency_inequality with:"<<endl;
+		filew << "# Wealth at each time step for the simulation Efficiency_inequality with:"<<endl;
 		filew << "#N=" << cons.N << " T="<<cons.T  << " S=";
 		filew << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
 		filew << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		filew << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 	}
 
+	// The MEMORY file 	
+	filem.open(filenamem,ios::out|ios::trunc); 
+	if(filem.is_open()){
+		filem << "# Memory at each time step for the simulation Efficiency_inequality with:"<<endl;
+		filem << "#N=" << cons.N << " T="<<cons.T  << " S=";
+		filem << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
+		filem << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
+		filem << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
+	}
 
 	// The COOPERATION file
 	filec.open(filenamec,ios::out|ios::trunc);
@@ -155,9 +173,6 @@ int main() {
 
 	// *********** Initialise description of agents and groups (START GENERATING ALL THE STUFF) *********** //
 
-	// Print for testing
-	cout << "Initialising the agents and groups" << endl;
-
 	// Check that number of agents N is exactly divisible by size of groups S 
 	if((cons.N%cons.S) != 0){ 
 		// cout<<"The number of agents is not exactly divisible by the number of groups"<<endl;
@@ -170,7 +185,6 @@ int main() {
 	// FILL THE VECTORS OF TALENT , WEALTH AND RANKING AND INITIALIZE EVERYTHING
 	t=0;			
 	eff=0;
-
 
 	// The arrays describing agents	
 	for(i=0;i<cons.N;i++){
@@ -188,13 +202,16 @@ int main() {
 
 		// All initial strategies are full defection => contribution of all agents is 0
     		alpha[i]=0; 
+
+		// The memory array 
+		for (int j=0; j<N_alpha; j++){
+			int ID = i*N_alpha + j;
+			memory[ID] = 1.0;
+		}
 	}
-
-
 
 	// Close the talent file as it is not used anymore
 	filer.close();
-
 
 	// Renormalise wealth w[]
 	//renormalizearray(w,cons.N);
@@ -202,12 +219,14 @@ int main() {
 	//Total initial wealth. I don't really need to initialize this, but it's better anyway
 	wealth = sumofvector(w, cons.N);
 
-
 	//It is important to initialize this!
 	oldwealth=wealth; 
 
 	// Now I fill up the output files at t=0
 	printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons); 	// Print time, gini coefficient, efficiency and all the wealth of the initial state.
+
+	// Print memory for testing purposes
+	printMemory(filem, t, cons.N, N_alpha, memory);
 
 	// Print for testing
 	cout << "Initialisation complete" << endl;
@@ -223,19 +242,19 @@ int main() {
 
 	for ( t=1; t<(cons.T+1); t++ ){
 
-
-		// *** Save the old strategy *** // 
-		for( i=0; i<cons.N; i++){
-			oldalpha[i] = alpha[i];
+		// ** Save the previous wealth vector --> for memory updating ** //
+		for (int j=0; j<cons.N; j++){
+			OLDw[j] = w[j];
 		}
-
 
 		// *** Update strategy for all players *** //
 		for( i=0; i<cons.N; i++){
 
-			// Here I update the strategy of agent i according to a logit distribution and using the old strategy (from previous timestep). Miopic best response!
-			updatestrategy(i,alpha,oldalpha,w,r,cons, gslpointer);
-
+			// The strategy is updated based on the memory of the agent
+			//updatestrategy(i,alpha,oldalpha,w,r,cons, gslpointer);
+			int tmp = newStrategySML(i, memory, N_alpha, cons, gslpointer);
+			//current_alpha[i] = tmp;
+			alpha[i] = tmp*alpha_interval;
 		}
 
 		// *** "Play the game" with the new strategys *** //
@@ -252,8 +271,37 @@ int main() {
 		eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
 		oldwealth = wealth;		 
 
+		// ** Update the memory, using the growth of wealth ** //
+/*
+		for (int j=0; j<cons.N; j++){
+
+			// Calculate the growth for the agent
+			double tmp_growth = (w[j] - OLDw[j])/OLDw[j];
+
+			// Get the memory ID
+			int ID = j*N_alpha + current_alpha[j];
+
+			// Find the current memory value
+			float tmp_mem = memory[ID];
+
+			// Calculate the new memory
+			memory[ID] = tmp_mem*(1.0 + mUpDate*tmp_growth);			
+		}
+*/
+
+		// Each player updates their memory for each possible strategy
+		// they could have taken, by fixing the strategies of other 
+		// player to the ones they picked and seeing how much they would
+		// have won. 
+		memoryUpdate(memory, alpha,  OLDw, r, N_alpha, cons);
+
+
 		// Print time, Gini coefficient, efficiency and all the wealth for the aldt timestep.
 		printstuffsingleloop(filet, filew, filec, t, eff, w, alpha,cons); 
+
+		// Print memory for testing purposes
+		printMemory(filem, t, cons.N, N_alpha, memory);
+
 
 		// Print the time to commandline for checking the runtime.
 		cout<<"Timestep "<< t << endl; 		
@@ -272,5 +320,6 @@ int main() {
 	filet.close();
 	filew.close();
 	filec.close();
+	filem.close();
 	return 0;
 }

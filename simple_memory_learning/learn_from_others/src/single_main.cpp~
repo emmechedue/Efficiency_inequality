@@ -113,7 +113,6 @@ int main() {
 		filew << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 	}
 
-
 	// The COOPERATION file
 	filec.open(filenamec,ios::out|ios::trunc);
 	if(filec.is_open()){ 
@@ -155,9 +154,6 @@ int main() {
 
 	// *********** Initialise description of agents and groups (START GENERATING ALL THE STUFF) *********** //
 
-	// Print for testing
-	cout << "Initialising the agents and groups" << endl;
-
 	// Check that number of agents N is exactly divisible by size of groups S 
 	if((cons.N%cons.S) != 0){ 
 		// cout<<"The number of agents is not exactly divisible by the number of groups"<<endl;
@@ -170,7 +166,7 @@ int main() {
 	// FILL THE VECTORS OF TALENT , WEALTH AND RANKING AND INITIALIZE EVERYTHING
 	t=0;			
 	eff=0;
-
+	oldeff=0; 		// I don't really need to initialize this, but it's better anyway
 
 	// The arrays describing agents	
 	for(i=0;i<cons.N;i++){
@@ -190,11 +186,8 @@ int main() {
     		alpha[i]=0; 
 	}
 
-
-
 	// Close the talent file as it is not used anymore
 	filer.close();
-
 
 	// Renormalise wealth w[]
 	//renormalizearray(w,cons.N);
@@ -202,12 +195,12 @@ int main() {
 	//Total initial wealth. I don't really need to initialize this, but it's better anyway
 	wealth = sumofvector(w, cons.N);
 
-
 	//It is important to initialize this!
 	oldwealth=wealth; 
 
 	// Now I fill up the output files at t=0
 	printstuffsingleloop(filet, filew, filec, t, eff, w,alpha, cons); 	// Print time, gini coefficient, efficiency and all the wealth of the initial state.
+
 
 	// Print for testing
 	cout << "Initialisation complete" << endl;
@@ -223,12 +216,10 @@ int main() {
 
 	for ( t=1; t<(cons.T+1); t++ ){
 
-
 		// *** Save the old strategy *** // 
 		for( i=0; i<cons.N; i++){
 			oldalpha[i] = alpha[i];
 		}
-
 
 		// *** Update strategy for all players *** //
 		for( i=0; i<cons.N; i++){
@@ -251,6 +242,7 @@ int main() {
 		eff = wealth - oldwealth;
 		eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
 		oldwealth = wealth;		 
+
 
 		// Print time, Gini coefficient, efficiency and all the wealth for the aldt timestep.
 		printstuffsingleloop(filet, filew, filec, t, eff, w, alpha,cons); 
