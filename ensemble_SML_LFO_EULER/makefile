@@ -7,20 +7,29 @@ CXX=g++
 # gsl for the RNG
 # gmp for multiprecision --> needed for GMP & MPFR 
 # mpfr for multiprecision --> needed for MPFR
-LDFLAGS = -lgsl -lgslcblas -lgmp -lgmpxx -lmpfr
+
+# FOR LINKING THE LIBRARIES ON EULER 
+GMP=$(HOME)/bin/GMP/include
+MPFR=$(HOME)/bin/MPFR/include
+LD_GMP=$(HOME)/bin/GMP/lib 
+LD_MPFR=$(HOME)/bin/MPFR/lib 
+#LDFLAGS = -lgsl -lgslcblas -L$(LD_GMP) -lgmp -lgmpxx -L$(LD_MPFR) -lmpfr
+LDFLAGS = -lgsl -lgslcblas -L$(LD_GMP) -lgmp  -L$(LD_MPFR) -lmpfr
+
 
 # Flag for your Boost --> needed for multiprecision (all three versions)
-BOOST=/usr/local/boost_1_58_0
+#BOOST=/usr/local/boost_1_58_0
 #BOOST=/usr/include/boost
+# BOOST ON EULER
+BOOST=/cluster/apps/boost/1.55.0/x86_64/serial/gcc_4.8.2/include
 
 # Flags for include folder (header files)
-INCFLAGS = -Iinclude -I$(BOOST)
-
+INCFLAGS = -Iinclude -I$(BOOST) -I$(MPFR) -I$(GMP)
 
 # Set default compiler parameters
 # -Wall 	shows all warnings when compiling, always use this!
 # -std=c++11 	enables the C++11 standard mode
-CXXFLAGS = -Wall -std=c++11  $(LDFLAGS) $(INCFLAGS) 
+CXXFLAGS = -Wall -std=c++11 $(LDFLAGS) $(INCFLAGS) 
 
 
 
