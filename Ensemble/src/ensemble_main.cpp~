@@ -101,12 +101,12 @@ int main() {
 	filew.open(filenamew,ios::out|ios::trunc); 
 	if(filew.is_open()){
 		filew << "# Total wealth of each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
-		filew << "#N=" << cons.N << " T="<<cons.T  << " S=";
+		filew << "# N=" << cons.N << " T="<<cons.T  << " S=";
 		filew << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
 		filew << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		filew << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//filew << "Time step\tTotal wealth for each 'society'" << endl;
-		filew << "# Total wealth -> Rows: timesteps\tColumns: 'societies'" << endl;	
+		filew << "# Total wealth -> Rows: 'societies' \tColumns: timesteps" << endl;	
 		filew << "#" << endl;
 	}
 
@@ -114,12 +114,12 @@ int main() {
 	fileEf.open(filenameEf,ios::out|ios::trunc); 
 	if(fileEf.is_open()){
 		fileEf << "# Efficiency of each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
-		fileEf << "#N=" << cons.N << " T="<<cons.T  << " S=";
+		fileEf << "# N=" << cons.N << " T="<<cons.T  << " S=";
 		fileEf << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
 		fileEf << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
 		fileEf << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//fileEf << "Time step\tTotal wealth for each 'society'" << endl;
-		fileEf << "# Efficiency -> Rows: timesteps\tColumns: 'societies'" << endl;	
+		fileEf << "# Efficiency -> Rows: 'societies' \tColumns: timesteps" << endl;	
 		fileEf << "#" << endl;
 	}
 
@@ -127,12 +127,12 @@ int main() {
 	filec.open(filenamec,ios::out|ios::trunc);
 	if(filec.is_open()){ 
 		filec << "# Average strategy/co-op for each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
-		filec << "#N=" << cons.N << " T=" << cons.T  << " S=";
+		filec << "# N=" << cons.N << " T=" << cons.T  << " S=";
 		filec << cons.S << " Q=" << cons.Q  << " mu=" << cons.mu;
 		filec << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		filec << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//filec << "Time step\tAverage co-op/strategy for each 'society'" << endl;	
-		filec << "# Average strategy/co-op -> Rows: timesteps\tColumns: 'societies'" << endl;		
+		filec << "# Average strategy/co-op -> Rows: 'societies' \tColumns: timesteps" << endl;		
 		filec << "#" << endl;
 	}
 
@@ -140,12 +140,12 @@ int main() {
 	fileg.open(filenameg,ios::out|ios::trunc);
 	if(filec.is_open()){ 
 		fileg << "# Gini coef. for each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
-		fileg << "#N=" << cons.N << " T=" << cons.T  << " S=";
+		fileg << "# N=" << cons.N << " T=" << cons.T  << " S=";
 		fileg << cons.S << " Q=" << cons.Q  << " mu=" << cons.mu;
 		fileg << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		fileg << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
 		//fileg << "Time step\tGini coef. for each 'society'" << endl;
-		fileg << "# Gini coef -> Rows: timesteps\tColumns: 'societies'" << endl;	
+		fileg << "# Gini coef -> Rows: 'societies' \tColumns: timesteps" << endl;	
 		fileg << "#" << endl;
 	}
 
@@ -153,11 +153,10 @@ int main() {
 	filer.open(filenamer,ios::out|ios::trunc); //Open the talent file
 	if(filer.is_open()){
 		filer << "# Talent for each player in each society with simulation configurations:"<<endl;
-		filer << "#N=" << cons.N << " T=" << cons.T << " S=";
+		filer << "# N=" << cons.N << " T=" << cons.T << " S=";
 		filer << cons.S << " Q=" << cons.Q <<  " mu=" << cons.mu;
 		filer << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
 		filer << " monincr=" << cons.monincr << " beta=" << cons.beta << " seed=" << seed << endl;
-		filer << "#" << endl;
 		filer << "# Rows: 'societies'\tColumns: individuals/players" << endl;
 		filer << "#" << endl;
 	}
