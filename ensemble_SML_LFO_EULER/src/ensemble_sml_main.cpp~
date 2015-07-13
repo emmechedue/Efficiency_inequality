@@ -195,8 +195,7 @@ int main() {
 	
 		// Print for testing
 		cout << "Initialising society nr " << k << endl;
-		cout << endl;
-
+		
 
 		// FILL THE VECTORS OF TALENT , WEALTH AND RANKING AND INITIALIZE EVERYTHING
 		t=0;			
