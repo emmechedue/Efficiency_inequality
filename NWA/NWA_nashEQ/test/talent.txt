@@ -1,0 +1,6 @@
+# Talent for each player in each society with simulation configurations:
+# N=20 T=25 S=4 Q=0.3 mu=-1 sigmag=0.22 W0=2 choice=1 monincr=100 beta=0.05 seed=47450273
+# Rows: 'societies'	Columns: individuals/players
+#
+1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	
+1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	1       	

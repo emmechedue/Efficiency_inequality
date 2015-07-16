@@ -300,23 +300,6 @@ int main() {
 			// have won. 
 			memoryUpdate(memory, alpha,  OLDw, r, N_alpha, cons);
 
-			
-				// ** "Play the game" with the new strategys ** //
-	
-				// I generate the ranking and compute the output for each player.
-				//makeorder(r_k, w_k, alpha_k, rank_k, cons, O);
-				makeorder(r, w, alpha, rank, cons, O); 
-	
-				// Here I use the ranking to generate the groups and update the wealth of the players.
-				//formgroups(w_k, alpha_k, O, rank_k, cons, M);
-				formgroups(w, alpha, O, rank, cons, M); 
-	
-				// Here I compute the total amount of wealth. And the efficiency, which is defined as the percentage increase of wealth.
-				wealth = sumofvector(w, N);
-				eff = wealth - oldwealth;
-				eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
-				oldwealth = wealth;		 		
-
 	
 			// *** Outputting *** // 
 	

@@ -21,8 +21,8 @@
 #include<gsl/gsl_randist.h> //Needed for the beta pdf
 
 // My includes
-#include "ensemble_sml_Constants.h"
-#include "ensemble_sml_Fcts.h"
+#include "NWA_sml_Constants.h"
+#include "NWA_sml_Fcts.h"
 
 
 using namespace std;
@@ -53,6 +53,11 @@ int main() {
 	int rank[N];		// Ranking array: shows in which order the agents are. 
 				// IMPORTANT CONVENTION: The HIGHER the ORDER of agent, the BETTER the PLACEMENT !!!
 	double O[N];		// Array to hold the output for each turn !!! THIS DOES NOT NEED MORE THEN N ENTRIES !!!
+
+
+	// The contribution limit for every game 
+	double w0;
+
 
 
 	// Variables for the memory thingy
@@ -201,6 +206,9 @@ int main() {
 
 		
 			eff = 0.0;
+
+			// Fix the value for the contribution limit for each game
+			w0 = cons.W0;
 			
 			// The arrays describing agents
 			for(int i=0; i<N; i++){
@@ -211,9 +219,15 @@ int main() {
 				// Intial rank is efectivly random
 		    		rank[i]=i;		
 				
-				// Gaussian distributed talent. Have to add the mean of the gaussian because the generator has mean zero.  
-		    		r[i]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
-	
+				// Gaussian distributed talent. Have to add the mean of the gaussian because the generator has mean zero.
+				// !!!!! IF the mean is negative --> EQUAL TALENT SIMULATION !!!!! // 
+				if(cons.mu > 0 ){  
+		    			r[i]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
+				}
+				else{ 
+					r[i] = 1.0;
+				}
+
 				// All initial trategies are full defection = contribution of all agents is 0
 				alpha[i]=0;
 
@@ -282,10 +296,14 @@ int main() {
 			// *** "Play the game" with the new strategys *** //
 
 			// I generate the ranking and compute the output for each player.
-			makeorder(r,w,alpha,rank,cons,O); 
+			//makeorder(r,w,alpha,rank,cons,O); 
+
+			// !!! This is where NO_WEALTH_ACCUMULATION is hidden !!! //
+			makeorder_NWA(r, w0, alpha, rank, cons, O); 
 
 			// Here I use the ranking to generate the groups and update the wealth of the players.
-			formgroups(w, alpha, O,rank, cons, M); 
+			//formgroups(w, alpha, O,rank, cons, M); 
+			formgroups_NWA(w, alpha, O,rank, cons, M); 
 
 			// Here I compute the total amount of wealth. And the efficiency, which is defined as the percentage increase of wealth.
 			wealth = sumofvector(w, cons.N);
@@ -299,6 +317,8 @@ int main() {
 			// player to the ones they picked and seeing how much they would
 			// have won. 
 			memoryUpdate(memory, alpha,  OLDw, r, N_alpha, cons);
+
+
 
 	
 			// *** Outputting *** // 

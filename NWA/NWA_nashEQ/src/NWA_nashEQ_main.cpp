@@ -21,8 +21,8 @@
 #include<gsl/gsl_randist.h> //Needed for the beta pdf
 
 // My includes
-#include "ensemble_sml_Constants.h"
-#include "ensemble_sml_Fcts.h"
+#include "NWA_nashEQ_Constants.h"
+#include "NWA_nashEQ_Fcts.h"
 
 
 using namespace std;
@@ -49,23 +49,18 @@ int main() {
 	double r[N];		// Array to hold talent of each agent
 	double w[N];		// Array to hold wealth of each agent
 	double alpha[N];	// Array to hold contribution coefficient of each agent (contribution == strategy == co-op)
-	double OLDw[cons.N];	// Array to hold OLDwealth of each agent	
+	double oldalpha[N];	// Array to hold the contribution coefficient (strategy) for each agent from the last timestep
 	int rank[N];		// Ranking array: shows in which order the agents are. 
 				// IMPORTANT CONVENTION: The HIGHER the ORDER of agent, the BETTER the PLACEMENT !!!
 	double O[N];		// Array to hold the output for each turn !!! THIS DOES NOT NEED MORE THEN N ENTRIES !!!
 
+	// The contribution limit for every game 
+	double w0;
 
-	// Variables for the memory thingy
-	int N_alpha = cons.monincr + 1; 		// The number of different strategies possible
-	double alpha_interval = 1.0/cons.monincr;	// The interval lenght of the contribution discritasation
-	double *memory = new double [cons.N*N_alpha]; 	// The array for the memory
-	//int current_alpha[cons.N];			// The array to hold the index of the currently used strategies.
-	//double mUpDate=cons.mUpDate;			// The coef. for memory update 
 
 
 	// Supporting variables for different purposes 
 	int t;
-	int i; 			// Support variable 
 	double eff;		// These are to print the efficiency and then renormalize the wealth.
 	double wealth;  	// Wealth is the total wealth at every time step for each society
 	double oldwealth;	// Oldwealth is a support variable I need to compute the efficiency
@@ -77,7 +72,7 @@ int main() {
 	ofstream filec;		// Cooperation output stream
 	ofstream filer;		// Talent output stream
 	ofstream fileg;		// Gini coef. output stream
-	ofstream fileEf;	// Efficientcy output stream
+	ofstream fileEf;		// Efficientcy output stream
 	
 	const char filenamep[]="parameters.txt";	// File to hold the simulation input parameters	
 	const char filenamew[]="wealth.txt"; 		// File to hold the total wealth for each ensemble for each timestep
@@ -108,7 +103,7 @@ int main() {
 	// The WEALTH file 	
 	filew.open(filenamew,ios::out|ios::trunc); 
 	if(filew.is_open()){
-		filew << "# Total wealth of each 'society' at each time step for the simulation Efficiency_inequality SML_LFO with:"<<endl;
+		filew << "# Total wealth of each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
 		filew << "# N=" << cons.N << " T="<<cons.T  << " S=";
 		filew << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
 		filew << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
@@ -121,7 +116,7 @@ int main() {
 	// The EFFICIENCY file 	
 	fileEf.open(filenameEf,ios::out|ios::trunc); 
 	if(fileEf.is_open()){
-		fileEf << "# Efficiency of each 'society' at each time step for the simulation Efficiency_inequality SML_LFO with:"<<endl;
+		fileEf << "# Efficiency of each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
 		fileEf << "# N=" << cons.N << " T="<<cons.T  << " S=";
 		fileEf << cons.S << " Q=" << cons.Q << " mu="<<cons.mu;
 		fileEf << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " 	choice=" << cons.Choice;
@@ -134,7 +129,7 @@ int main() {
 	// The COOPERATION file
 	filec.open(filenamec,ios::out|ios::trunc);
 	if(filec.is_open()){ 
-		filec << "# Average strategy/co-op for each 'society' at each time step for the simulation Efficiency_inequality SML_LFO with:"<<endl;
+		filec << "# Average strategy/co-op for each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
 		filec << "# N=" << cons.N << " T=" << cons.T  << " S=";
 		filec << cons.S << " Q=" << cons.Q  << " mu=" << cons.mu;
 		filec << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
@@ -147,7 +142,7 @@ int main() {
 	// The GINI COEF. file
 	fileg.open(filenameg,ios::out|ios::trunc);
 	if(filec.is_open()){ 
-		fileg << "# Gini coef. for each 'society' at each time step for the simulation Efficiency_inequality SML_LFO with:"<<endl;
+		fileg << "# Gini coef. for each 'society' at each time step for the simulation Efficiency_inequality with:"<<endl;
 		fileg << "# N=" << cons.N << " T=" << cons.T  << " S=";
 		fileg << cons.S << " Q=" << cons.Q  << " mu=" << cons.mu;
 		fileg << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
@@ -160,7 +155,7 @@ int main() {
 	// The TALENT file 
 	filer.open(filenamer,ios::out|ios::trunc); //Open the talent file
 	if(filer.is_open()){
-		filer << "# Talent for each player in each society with simulation configurations (SML_LFO):"<<endl;
+		filer << "# Talent for each player in each society with simulation configurations:"<<endl;
 		filer << "# N=" << cons.N << " T=" << cons.T << " S=";
 		filer << cons.S << " Q=" << cons.Q <<  " mu=" << cons.mu;
 		filer << " sigmag=" << cons.sigmag << " W0=" << cons.W0 << " choice=" << cons.Choice;
@@ -192,9 +187,6 @@ int main() {
 
 		// *********** Initialise description of agents and groups (START GENERATING ALL THE STUFF) *********** //
 	
-		// Print for testing
-		cout << "Initialising society nr " << k << endl;
-		
 
 		// FILL THE VECTORS OF TALENT , WEALTH AND RANKING AND INITIALIZE EVERYTHING
 		t=0;			
@@ -202,26 +194,28 @@ int main() {
 		
 			eff = 0.0;
 			
-			// The arrays describing agents
+			// Fix the value for the contribution limit for each game
+			w0 = cons.W0;
+			
+	
 			for(int i=0; i<N; i++){
 		
-				// Initial wealth W0 is equal for all
 				w[i]=cons.W0;		
 	
 				// Intial rank is efectivly random
 		    		rank[i]=i;		
 				
 				// Gaussian distributed talent. Have to add the mean of the gaussian because the generator has mean zero.  
-		    		r[i]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
+				// !!!!! IF the mean is negative --> EQUAL TALENT SIMULATION !!!!! // 
+				if(cons.mu > 0 ){  
+		    			r[i]=gsl_ran_gaussian(gslpointer,cons.sigmag)+cons.mu;
+				}
+				else{ 
+					r[i] = 1.0;
+				}
 	
 				// All initial trategies are full defection = contribution of all agents is 0
 				alpha[i]=0;
-
-				// The memory array 
-				for (int j=0; j<N_alpha; j++){
-				int ID = i*N_alpha + j;
-				memory[ID] = 1.0;
-				}
 			}
 	
 		// Print out the talent for each player 
@@ -249,12 +243,7 @@ int main() {
 		ensemblePrint(fileEf, filew, filec, fileg, t, eff, wealth, w, alpha, cons, N);
 	
 	
-
-		// Print for testing
-		cout << "Initialisation of society nr " << k << " complete" << endl;
-		cout << endl;	
-
-
+	
 		// ********************* END OF INITIALISATION ********************* //		
 	
 	
@@ -263,42 +252,39 @@ int main() {
 		// ************************************************************* //
 	
 		for ( t=1; t<(cons.T+1); t++ ){
-
-			// ** Save the previous wealth vector --> for memory updating ** //
-			for (int j=0; j<cons.N; j++){
-				OLDw[j] = w[j];
+	
+			// *** Save the old strategy *** // 		
+			for(int i=0; i<(N); i++){
+				oldalpha[i] = alpha[i];
 			}
 
-			// *** Update strategy for all players *** //
-			for( i=0; i<cons.N; i++){
 
-				// The strategy is updated based on the memory of the agent
-				//updatestrategy(i,alpha,oldalpha,w,r,cons, gslpointer);
-				int tmp = newStrategySML(i, memory, N_alpha, cons, gslpointer);
-				//current_alpha[i] = tmp;
-				alpha[i] = tmp*alpha_interval;
-			}
+			
+				// ** Update strategy for each player in each in k-th society ** //
+				for (int i=0; i<N; i++){
+					//alpha[k*N + i] = NewStrategy(i, alpha_k, w_k, r_k, cons, gslpointer);
+					alpha[i] = NewStrategy(i, oldalpha, w, r, cons, gslpointer);
+				}
 
-			// *** "Play the game" with the new strategys *** //
+			
+				// ** "Play the game" with the new strategys ** //
+	
+				// I generate the ranking and compute the output for each player.
+				//makeorder(r_k, w_k, alpha_k, rank_k, cons, O);
+				//makeorder(r, w, alpha, rank, cons, O); 
 
-			// I generate the ranking and compute the output for each player.
-			makeorder(r,w,alpha,rank,cons,O); 
-
-			// Here I use the ranking to generate the groups and update the wealth of the players.
-			formgroups(w, alpha, O,rank, cons, M); 
-
-			// Here I compute the total amount of wealth. And the efficiency, which is defined as the percentage increase of wealth.
-			wealth = sumofvector(w, cons.N);
-			eff = wealth - oldwealth;
-			eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
-			oldwealth = wealth;		 
-
-
-			// Each player updates their memory for each possible strategy
-			// they could have taken, by fixing the strategies of other 
-			// player to the ones they picked and seeing how much they would
-			// have won. 
-			memoryUpdate(memory, alpha,  OLDw, r, N_alpha, cons);
+				// !!! This is where NO_WEALTH_ACCUMULATION is hidden !!! //
+				makeorder_NWA(r, w0, alpha, rank, cons, O); 
+	
+				// Here I use the ranking to generate the groups and update the wealth of the players.
+				//formgroups(w, alpha, O,rank, cons, M); 
+				formgroups_NWA(w, alpha, O,rank, cons, M);
+	
+				// Here I compute the total amount of wealth. And the efficiency, which is defined as the percentage increase of wealth.
+				wealth = sumofvector(w, N);
+				eff = wealth - oldwealth;
+				eff = eff/oldwealth; // I separate those 2 because in this way it should be better for numerical errors, right?
+				oldwealth = wealth;		 		
 
 	
 			// *** Outputting *** // 
@@ -328,25 +314,11 @@ int main() {
 		filec << endl;
 		fileg << endl;
 		fileEf << endl;
-
-		
-		// Print for testing
-		cout << endl;		
-		cout << "Simulation for society nr " << k << " complete" << endl;
-		cout << endl;
-		cout << endl;
-		
+	
 	
 	}
 
-	// ----------- END OF LOOP OVER THE ENSEMBLE ------------ //
 	
-
-	// Print for testing
-	cout << endl;
-	cout << endl;
-	cout << "Simulation of all " << NE << " societies complete" << endl;
-	cout << endl;
 
 	// ******************************************************************* //
 	// ********************* CLOSE ALL THE OFSTRESMS ********************* //		
