@@ -530,6 +530,35 @@ double getutility(int q, double *w, double *alpha, double *O, int *rank, Constan
 	
 	return utility;
 }
+
+
+// NWA version of get utility //
+double getutility_NWA(int q, double *w, double *alpha, double *O, int *rank, Constants cons, int M){
+	int j,k; //i and j are dummy variables, k needs to be updated by hand and will be used for the rank
+	double gain, utility; //The gain in the group and the utlity of q
+        int g; //The group in which q is
+        int place; //The rank of q
+        
+        /*As first thing we have to compute what is the ranking of */
+        place=inverserank(q,rank,cons);
+        /*As second thing we have to compute in which group the q-th agent is ending up*/
+        g = place/cons.S;
+        
+        /*Then I skip directly to that group and compute the gain in that group*/
+        k=cons.S * g; //I start from the k-th ranked agent
+        gain=0; //Set the gain of the group to 0.
+	
+        for(j=0;j<cons.S;j++){
+            gain = gain + O[rank[k+j]]; //Here I am adding to the common pool the contribution due to rank[k+j]. Due to how the systyem is designed, one of those people is q
+	}
+		
+	gain = gain*cons.Q; //Correct for the return rate
+		
+        utility = w[q] - cons.W0*alpha[q] + gain; //This is the utility	
+	
+	return utility;
+}
+
 //******************************************************************************************************
 
 int binaryprobsearch(double *Gamma, int M, double x) { //Binary search. Gamma is the array of cumulative prob. M is the lenght of the array and x is the random number between zero and one
@@ -675,6 +704,9 @@ int newStrategySML(int k, double *memory, int N_alpha, Constants cons, gsl_rng *
 	
 		// Find the appropriate ID
 		int ID = k*N_alpha + i;
+		
+		// Testing
+		//cout << memory[ID] << endl;
 
 		//Here I compute the probability according to the logit and the sum
 	    	// ***** I use mpEXP from myEXP.h for taking the exponent ***** //
@@ -752,6 +784,7 @@ void memoryUpdate(double *memory, double *alpha,  double *OLDw, double *r, int N
 			// Make the rankings 
 			makeorder(r,OLDw,dummyalpha,dummyrank,cons,dummyO);
 
+
 			// The position where k is placed	
 			place=inverserank(k,dummyrank,cons);			
 		
@@ -797,6 +830,97 @@ void memoryUpdate(double *memory, double *alpha,  double *OLDw, double *r, int N
 
 	}
 }
+
+
+
+
+
+// NWA memoryUpdate
+
+void memoryUpdate_NWA(double *memory, double *alpha,  double *OLDw, double *r, int N_alpha, Constants cons){
+
+	// --- Dummy variables --- //
+	int dummyrank[cons.N];		//The vector that will do all the ranking
+	double dummyO[cons.N];		//The dummy vector of outputs
+	double dummyalpha[cons.N];	//A dummy vector where I copy all the strategies of the other players and then I update the one of player k
+	int oldplace=-1;		//Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative
+	int place;			//To store the ranking of the k-th agent
+	double utility, oldutility;	//they contain the possible utility for player k for a strategy and the previous one
+	double lenghtofinterval= 1./cons.monincr ; //Lenght of the interval in which I divide the interval [0,1]
+	int M = cons.N/cons.S; 		// I already check in the main that I can do that
+
+
+	// --- Fill the dummyalpha --- //
+	for (int k=0; k<cons.N; k++){
+		dummyalpha[k] = alpha[k];
+	}
+
+	// ----- Loop over players ------ //
+	for (int k=0; k<cons.N; k++){
+
+		// ---- Loop over all strategies for k-th player ---- //
+		for (int i=0; i<N_alpha; i++){
+
+
+			// -- Play the game for the k-th strategy -- //
+
+			// Set the strategy of k
+			dummyalpha[k]  = i*lenghtofinterval;
+
+			// Make the rankings 
+			//makeorder(r,OLDw,dummyalpha,dummyrank,cons,dummyO);
+			// !!! This is where NO_WEALTH_ACCUMULATION is hidden !!! //
+			//makeorder_NWA(r, cons.W0, alpha, rank, cons, O); 
+			makeorder_NWA(r, cons.W0, dummyalpha, dummyrank, cons, dummyO);
+
+			// The position where k is placed	
+			place=inverserank(k,dummyrank,cons);			
+		
+			// Calculate the utility for the k-th player //
+			if(!(place==oldplace)){ 
+
+				// Form the group and compute the utility
+            			utility=getutility_NWA(k, OLDw, dummyalpha, dummyO, dummyrank, cons, M); 
+        		}
+			// If the rank of k is the same, I don't have to reform the groups. I just update the utility
+		        else{ 
+		             utility=oldutility + lenghtofinterval * cons.W0 * (cons.Q * r[k] -1);
+        		}
+
+
+
+			// -- Now that I have the utility I can update the memory -- //
+			
+			// Calculate the growth for the k-th agent
+			double tmp_growth = utility/OLDw[k];
+
+			// Get the memory ID
+			int ID = k*N_alpha + i;
+
+			// Find the current memory value
+			float tmp_mem = memory[ID];
+
+			// Calculate the new memory
+			memory[ID] = tmp_mem*(1.0 + cons.mUpDate*tmp_growth);
+
+
+
+
+
+			// -- Save the oldutility and oldplace parameters -- //	
+			oldutility=utility;
+			oldplace=place;
+		}
+
+
+		// ---- Reset the correct strategy for k-th player ---- //
+		dummyalpha[k] = alpha[k];
+
+	}
+}
+
+
+
 
 
 

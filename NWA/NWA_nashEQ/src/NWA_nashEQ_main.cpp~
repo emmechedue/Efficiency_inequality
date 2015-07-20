@@ -324,13 +324,6 @@ int main() {
 	
 	}
 
-
-	
-	// Print for testing
-	cout << endl;
-	cout << endl;
-	cout << "Simulation of all " << NE << " societies complete" << endl;
-	cout << endl;
 	
 
 	// ******************************************************************* //
