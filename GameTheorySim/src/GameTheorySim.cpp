@@ -20,9 +20,9 @@ GameTheorySim::GameTheorySim(string SimName, bool SML){
 	// Define parameters for parsing the input file
 	char line[256];
 	int linenum=0;
-	int M=14; 		// M --> amount of parameters I have to give 
+	int NP=14; 		// NP --> amount of parameters I have to give 
 	int count=0;		// count will range from 0 to M-1
-	double ParamVec[M]; 	//will store the M parameters
+	double ParamVec[NP]; 	//will store the M parameters
 	FILE *pfile;
 
 	// Open the config.conf file
@@ -71,6 +71,7 @@ GameTheorySim::GameTheorySim(string SimName, bool SML){
 		exit(1);
 	} 
 
+	//cout << "Testing class contructor: M = " << M << " N = " << N << " S = " << S << endl;
 	
 	// --- Now dymanically initializing the arrays for describing the agents --- //
 	r = new double[N];		// Array to hold INVESTMENT TALENT of each agent
@@ -260,6 +261,9 @@ void GameTheorySim::runSimulation_NWA(string type){
 		// Loop over all of the societies
 		for (int scn = 0; scn < NE; scn++){
 
+			// Print parameters
+			ensemblePrintParams();
+
 			// Initialise society
 			initSociety_SML_NWA(scn);
 
@@ -271,6 +275,9 @@ void GameTheorySim::runSimulation_NWA(string type){
 
 		// Loop over all of the societies
 		for (int scn = 0; scn < NE; scn++){
+
+			// Print parameters
+			ensemblePrintParams();
 
 			// Initialise society
 			initSociety_NashEQ_NWA(scn);
@@ -512,7 +519,7 @@ void GameTheorySim::runSociety_SML_NWA(int k){
 		}
 
 		// Testing 
-		// cout << "Test2" << endl;
+		// cout << "Test2: Number of agent in a society is N = " << N << endl;
 
 		// *** "Play the game" with the new strategys *** //
 
@@ -520,11 +527,11 @@ void GameTheorySim::runSociety_SML_NWA(int k){
 		makeorder_NWA(alpha, rank, O); 
 		
 		// Testing 
-		// cout << "Test3" << endl;
+		// cout << "Test3: Number of groups M = " << M << endl;
 
 		// Here I use the ranking to generate the groups and update the wealth of the players.
 		//formgroups(w, alpha, O,rank, cons, M); 
-		formgroups_NWA(w, alpha, O,rank); 
+		formgroups_NWA(w, alpha, O, rank); 
 
 		// Testing 
 		// cout << "Test4" << endl;
@@ -545,7 +552,7 @@ void GameTheorySim::runSociety_SML_NWA(int k){
 		// they could have taken, by fixing the strategies of other 
 		// player to the ones they picked and seeing how much they would
 		// have won. 
-		memoryUpdate_NWA();
+		this->memoryUpdate_NWA();
 
 		// Testing 
 		// cout << "Test6" << endl;
@@ -705,6 +712,7 @@ void GameTheorySim::makeorder_NWA(double *alpha,int *rank, double *O){
 	// ****************** Generate the output vector //
 	for(i=0;i<enne;i++){ 
 		O[i]=r[i]*alpha[i]*w0[i];
+		//cout << "Testing makeorder_NWA. Output of agent " << i << " is " << O[i] << endl;
                 Y[i]=i;
 	}
 	// ********************* COMPUTE THE ORDERING ARRAY **************** //
@@ -712,27 +720,27 @@ void GameTheorySim::makeorder_NWA(double *alpha,int *rank, double *O){
 		case 1:
 			for(i=0;i<enne;i++){
 				X[i]=O[i];
-			}			
+			}	
+			//cout << "Testing makeorder_NWA. Choice is 1" << endl;		
 			break;
-			
 		case 2:
 			for(i=0;i<enne;i++){
 				X[i]=alpha[i]*w0[i];
 			}
+			//cout << "Testing makeorder_NWA. Choice is 2" << endl;
 			break;
-			
 		case 3:
 			for(i=0;i<enne;i++){
 				X[i]=r[i]*alpha[i];
-			}
+			}			
+			//cout << "Testing makeorder_NWA. Choice is 3" << endl;
 			break;
-			
 		case 4:
 			for(i=0;i<enne;i++){
 				X[i]=alpha[i];
 			}
+			//cout << "Testing makeorder_NWA. Choice is 4" << endl;
 			break;
-		
 		default:
 			cout<<"ERROR IN THE SWITCH IN THE MAKEORDER FUNCTION";
 			break;
@@ -782,6 +790,7 @@ void GameTheorySim::formgroups_NWA(double *w, double *alpha, double *O, int *ran
 	int i,j,k; 
 	double gain; // The gain in the group
 
+	//cout << "Testing formgroups_NWA: M = " << M << endl;
 	k=0; // Initialize k to zero
 	for(i=0;i<M;i++){ // Here i sum over all the groups
 		
@@ -796,6 +805,7 @@ void GameTheorySim::formgroups_NWA(double *w, double *alpha, double *O, int *ran
 		for(j=0; j<S;j++){
 			// !!!!! THIS IS DIFFERENT THEN THE USUAL CASE !!!!!! //
 			w[rank[k]] = w[rank[k]] - w0[rank[k]]*alpha[rank[k]] + gain; //Here I update the wealth of all the players
+			//cout << "Testing formgroups. Wealth of agent " << rank[k] << " is " << w[rank[k]] <<endl; 
 			k++; //Here I update k so that it keeps track for the next round
 		}
 		
@@ -828,7 +838,8 @@ double GameTheorySim::getutility_NWA(int q, double *w, double *alpha, double *O,
 		
 	gain = gain*Q; //Correct for the return rate
 		
-        utility = w[q] -w0[q]*alpha[q] + gain; //This is the utility	
+        utility = w[q] -w0[q]*alpha[q] + gain; //This is the utility
+	//cout << "Testing getutility! Utility of agent " << q << " is " << utility << endl;	
 	
 	return utility;
 }

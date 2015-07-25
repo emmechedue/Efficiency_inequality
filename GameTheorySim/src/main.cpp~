@@ -16,6 +16,7 @@ int main (int argc, char* argv[]){
 	// Define variables
 	bool SML;
 	string simType;
+	string simName("GameTheorySim");
 	int control=1;
 
 	// Check which kind of simulation I wish to conduct //
@@ -35,10 +36,17 @@ int main (int argc, char* argv[]){
 		exit(1);
 	}
 
+	// Can change the simulation name with commandline parameters if I wish //
+	if(cmdOptionExists(argv, argv+argc, "-N"))
+	{
+		char * tmp = getCmdOption(argv, argv + argc, "-N");
+		simName = string(tmp); 
+	}
+
 
 	if (control > 0){
 	
-		GameTheorySim myGTsim ("GameTheorySim Test", SML);
+		GameTheorySim myGTsim (simName, SML);
 		myGTsim.runSimulation_NWA(simType);
 	
 	}
