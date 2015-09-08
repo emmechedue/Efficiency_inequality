@@ -1,0 +1,4 @@
+# Total wealth of each 'society' at each time step for the simulation Efficiency_inequality SML_LFO with:
+# N=500 T=100 S=4 Q=0.3 mu=1 sigmag=0.22 W0=2 	choice=3 monincr=100 beta=0.5 seed=1415104340
+# Total wealth -> Rows: 'societies' 	Columns: timesteps
+#

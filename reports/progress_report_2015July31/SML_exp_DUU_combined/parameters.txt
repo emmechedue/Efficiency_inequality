@@ -1,0 +1,42 @@
+# Number of 'societies' in the ensemble
+NE= 25
+
+#Number of agents playing the game:
+N= 400
+
+#Time at which I stop the simulation:
+T= 200
+
+#Size of the groups:
+S= 4
+
+#Return rate:
+Q= 0.3
+
+#Indicates in how many intervals I want to divide the interval [0,1] for the contributions. The number of strategies available to each player is this number +1
+monincr= 100
+
+#This is the noise parameter in the logit:
+beta= 0.05
+
+#Number that indicates the choice of what are we using to rank agents in the groups:
+Choice= 4
+
+#Mean of the Gaussian distribution for the INVESTMENT TALENT --> Negative == const. as abs(muR):
+muR= 1
+
+#Variance sigma of the Gaussian distribution for the IVESTMENT TALENT:
+sigmagR= 0.22
+
+#Mean of the Gaussian distribution for the INVESTMENT CAP --> Negative == const. as abs(muW0):
+muW0= -1
+
+#Variance sigma of the Gaussian distribution for the IVESTMENT CAP:
+sigmagW0= 0.22
+
+#Mean of the Gaussian distribution for the LEARNING SKILL/TALENT --> Negative == const. as abs(muXI):
+muXI= -0.05
+
+#Variance sigma of the Gaussian distribution for the LEARNING SKILL/TALENT:
+sigmagXI= 0.022
+

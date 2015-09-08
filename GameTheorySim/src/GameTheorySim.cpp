@@ -209,6 +209,14 @@ GameTheorySim::GameTheorySim(string SimName, bool SML){
 			fileXI << "# Rows: 'societies'\tColumns: individuals/players" << endl;
 			fileXI << "#" << endl;
 		}
+
+		MemOut.open(FNMemOut,ios::out|ios::trunc); //Open the memory test file
+		if(MemOut.is_open()){
+			fileXI << HEAD << "Memory of each player in 'society'" << endl;
+			fileXI << PARAM_LIST << endl;
+			fileXI << "# Rows: 'Players'\tColumns: strategies" << endl;
+			fileXI << "#" << endl;
+		}
 	}
 
 
@@ -242,6 +250,9 @@ GameTheorySim::~GameTheorySim(){
 	if(fileXI.is_open()){
 		fileXI.close();
 	}
+	if(MemOut.is_open()){
+		MemOut.close();
+	}
 
 
 }
@@ -253,7 +264,7 @@ GameTheorySim::~GameTheorySim(){
 
 
 // --- Run Full simulation: either SML or NashEQ --- //
-void GameTheorySim::runSimulation_NWA(string type){
+void GameTheorySim::runSimulation_NWA(string type, bool MemTest){
 
 	// Check which type of simulation I wish to conduct. 	
 	if (type == "SML"){
@@ -265,10 +276,10 @@ void GameTheorySim::runSimulation_NWA(string type){
 			ensemblePrintParams();
 
 			// Initialise society
-			initSociety_SML_NWA(scn);
+			initSociety_SML_NWA(scn, MemTest);
 
 			// Run the simulation for that society
-			runSociety_SML_NWA(scn);
+			runSociety_SML_NWA(scn, MemTest);
 		}
 	}
 	else if (type == "NashEQ"){
@@ -303,7 +314,7 @@ void GameTheorySim::runSimulation_NWA(string type){
 
 
 // --- The society initialization method for simple memory learning (SML) schmea --- //
-void GameTheorySim::initSociety_SML_NWA(int k){
+void GameTheorySim::initSociety_SML_NWA(int k, bool MemTest){
 
 	// Print for testing
 	cout << "Initialising SML society nr " << k << endl;
@@ -383,6 +394,15 @@ void GameTheorySim::initSociety_SML_NWA(int k){
 	
 	// Total investment cap
 	totInvestCap = sumofvector(w0, N);
+
+
+	// ------------------------------------- //
+	// Print the memory for testing purposes //
+	if (MemTest){
+		printMemory(t);
+	}
+	// ------------------------------------- //
+
 	
 	
 	// Print the initial state // 
@@ -492,7 +512,7 @@ void GameTheorySim::initSociety_NashEQ_NWA(int k){
 
 
 // --- Run simulation for one full society for SML -- //
-void GameTheorySim::runSociety_SML_NWA(int k){
+void GameTheorySim::runSociety_SML_NWA(int k, bool MemTest){
 
 
 	// ************************************************************* //
@@ -553,6 +573,15 @@ void GameTheorySim::runSociety_SML_NWA(int k){
 		// player to the ones they picked and seeing how much they would
 		// have won. 
 		this->memoryUpdate_NWA();
+
+
+
+		// ------------------------------------- //
+		// Print the memory for testing purposes //
+		if (MemTest){
+			printMemory(t);
+		}
+		// ------------------------------------- //
 
 		// Testing 
 		// cout << "Test6" << endl;
@@ -1327,6 +1356,26 @@ void GameTheorySim::ensemblePrintXI(){
 				
 		}	
 	}
+}
+
+
+// --- printMemory -->> Prints the memory fo the Learning schema (For testing) --- //
+void GameTheorySim::printMemory(int t){
+
+	if(MemOut.is_open()){
+
+		MemOut << "# t = " << t << endl;
+
+		for (int i=0; i<N; i++){
+			for(int j=0; j<N_alpha; j++){
+				int ID = i*N_alpha + j;
+				MemOut << left << setw(6) << memory[ID] << "\t";
+			}
+			MemOut << endl;	
+		}
+
+	}
+
 }
 
 

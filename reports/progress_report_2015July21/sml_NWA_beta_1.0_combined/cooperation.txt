@@ -1,0 +1,4 @@
+# Average strategy/co-op for each 'society' at each time step for the simulation Efficiency_inequality SML_LFO with:
+# N=500 T=100 S=4 Q=0.3 mu=1 sigmag=0.22 W0=2 choice=1 monincr=100 beta=1 seed=1805283732
+# Average strategy/co-op -> Rows: 'societies' 	Columns: timesteps
+#

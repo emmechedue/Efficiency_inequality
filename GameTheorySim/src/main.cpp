@@ -18,12 +18,20 @@ int main (int argc, char* argv[]){
 	string simType;
 	string simName("GameTheorySim");
 	int control=1;
+	bool MemTest = false;
 
 	// Check which kind of simulation I wish to conduct //
 	if(cmdOptionExists(argv, argv+argc, "-SML"))
 	{
 		SML=true;
 		simType="SML";
+
+		// Check for memory test //
+		if(cmdOptionExists(argv, argv+argc, "-MT"))
+		{
+			MemTest=true;
+		}
+	
 	}
 	else if(cmdOptionExists(argv, argv+argc, "-NashEQ"))
 	{
@@ -47,7 +55,7 @@ int main (int argc, char* argv[]){
 	if (control > 0){
 	
 		GameTheorySim myGTsim (simName, SML);
-		myGTsim.runSimulation_NWA(simType);
+		myGTsim.runSimulation_NWA(simType, MemTest);
 	
 	}
 

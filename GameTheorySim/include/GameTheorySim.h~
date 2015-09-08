@@ -71,19 +71,19 @@ class GameTheorySim {
 	~GameTheorySim();
 
 	// The society initialization method for simple memory learning (SML) schmea //
-	void initSociety_SML_NWA(int k);
+	void initSociety_SML_NWA(int k, bool MemTest);
 
 	// The society initialization method for Nash Equlibrium schmea //
 	void initSociety_NashEQ_NWA(int k);
 
 	// Run simulation for one full society for SML //
-	void runSociety_SML_NWA(int k);
+	void runSociety_SML_NWA(int k, bool MemTest);
 
 	// Run simulation for one full society for NashEQ //
 	void runSociety_NashEQ_NWA(int k);
 
 	// Run Full simulation: either SML or NashEQ //
-	void runSimulation_NWA(string type);
+	void runSimulation_NWA(string type, bool MemTest);
 
 
 
@@ -167,6 +167,7 @@ class GameTheorySim {
 	ofstream fileXI;	// Learning Skill/Talent output stream
 	ofstream fileg;		// Gini coef. output stream
 	ofstream fileEf;	// Efficientcy output stream
+	ofstream MemOut;	// Memory testing output stream
 
 	const string filenamep = string ("parameters.txt");		// File to hold the simulation input parameters	
 	const string filenamew = string ("wealth.txt"); 		// File to hold the total wealth for each ensemble for each timestep
@@ -176,6 +177,7 @@ class GameTheorySim {
 	const string filenameXI = string ("learning_skill.txt");	// File to hold the learning skill/talent for each individual in each society (rows: societies, columns: individuals)
 	const string filenameg = string ("giniCoef.txt");		// File to hold the Gini coef. for each society on each time step.
 	const string filenameEf = string ("efficiency.txt");		// File to hold the efficientcy for each society on each time step.
+	const string FNMemOut = string ("memory_test.txt");		// File to hold the memory testing output at each timestep.
 	
 
 
@@ -188,10 +190,10 @@ class GameTheorySim {
 	// - Only NO Wealth Accumulation (NWA) methods at the moment - //
 
 	// The makeorder mehtod, which ALSO fills the OUTPUT array //
-	void makeorder_NWA(double &alpha, int &rank, double &O);		
+	void makeorder_NWA(double *alpha, int *rank, double *O);		
 
 	// The GROUPING methods, which ALSO claculate the UTILITY //
-	void formgroups_NWA(double &w, double &alpha, double &O, int &rank);			
+	void formgroups_NWA(double *w, double *alpha, double *O, int *rank);			
 
 	// Methods for calculating the utility of q-th agent without forming groups //
 	double getutility_NWA(int q, double *w, double *alpha, double *O, int *rank);	
@@ -241,6 +243,9 @@ class GameTheorySim {
 
 	// ensemblePrintXI -->> Prints the LEARNING SKILL/TALENT to the learning_skill.txt file //
 	void ensemblePrintXI();
+
+	// printMemory -->> Prints the memory of the learning schema || for testing purposes -->> have to give a opened ofstream //
+	void printMemory(int t);
 
 
 
