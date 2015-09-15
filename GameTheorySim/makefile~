@@ -35,7 +35,7 @@ CXXFLAGS = -Wall -std=c++11  $(LDFLAGS) $(INCFLAGS)
 PROGRAM = run
 
 # The needed object files (we make these from the source code)
-OBJ = obj/main.o obj/GameTheorySim.o obj/TimeEngine.o
+OBJ = obj/main.o obj/GameTheorySim.o obj/GTS_quadPayoff.o obj/TimeEngine.o
 
 # This is the first target. It will be built when you run 'make' or 'make all'
 all: $(PROGRAM) 
@@ -55,6 +55,9 @@ obj/main.o: src/main.cpp
 
 obj/GameTheorySim.o: src/GameTheorySim.cpp
 	$(CXX) -c src/GameTheorySim.cpp -o obj/GameTheorySim.o $(CXXFLAGS) 
+
+obj/GTS_quadPayoff.o: src/GTS_quadPayoff.cpp
+	$(CXX) -c src/GTS_quadPayoff.cpp -o obj/GTS_quadPayoff.o $(CXXFLAGS) 
 
 obj/TimeEngine.o: src/timeEngine.cpp
 	$(CXX) -c src/timeEngine.cpp -o obj/TimeEngine.o $(CXXFLAGS) 

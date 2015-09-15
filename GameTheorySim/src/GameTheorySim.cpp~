@@ -12,10 +12,16 @@ using namespace std;
 // -------------------------------------- //
 
 // Constructor //
-GameTheorySim::GameTheorySim(string SimName, bool SML){
+GameTheorySim::GameTheorySim(string inSimName, bool ifSML){
 //GameTheorySim::GameTheorySim(){
 
 	// --- Read input parameters from config.conf --- //
+
+	// Type: a bolean name SML 
+	SML = ifSML;
+
+	// Simulation name
+	SimName = inSimName;	
 
 	// Define parameters for parsing the input file
 	char line[256];
@@ -121,7 +127,10 @@ GameTheorySim::GameTheorySim(string SimName, bool SML){
 	fileg= new ofstream(filenameg,ios::out|ios::trunc));		// Gini coef. output stream
 	fileEf= new ofstream(filenameEf,ios::out|ios::trunc));	// Efficientcy output stream	
 */
+}
 
+// Initialization of the output files //
+void GameTheorySim::initOutput(string SimName, bool SML, bool memTest, bool singleP){
 	// --- Open the output files and write the headers --- //
 
 	// Define the Header template
@@ -139,10 +148,10 @@ GameTheorySim::GameTheorySim(string SimName, bool SML){
 	StrStream << " muR="<< muR << " sigmagR=" << sigmagR << " muW0="<< muW0 << " sigmagW0=" << sigmagW0 ;
 	StrStream << " muXI="<< muXI << " sigmagXI=" << sigmagXI <<  " seed=" << seed;
 	if(SML){
-		StrStream << " type=SML";
+		StrStream << " type=SML/linearPayoff";
 	}
 	else {
-		StrStream << " type=NashEq";
+		StrStream << " type=NashEq/linearPayoff";
 	}
 	PARAM_LIST = StrStream.str();
 
@@ -210,12 +219,35 @@ GameTheorySim::GameTheorySim(string SimName, bool SML){
 			fileXI << "#" << endl;
 		}
 
-		MemOut.open(FNMemOut,ios::out|ios::trunc); //Open the memory test file
-		if(MemOut.is_open()){
-			fileXI << HEAD << "Memory of each player in 'society'" << endl;
-			fileXI << PARAM_LIST << endl;
-			fileXI << "# Rows: 'Players'\tColumns: strategies" << endl;
-			fileXI << "#" << endl;
+		// The Memory test file
+		if(memTest){
+			MemOut.open(FNMemOut,ios::out|ios::trunc); //Open the memory test file
+			if(MemOut.is_open()){
+				MemOut << HEAD << "Memory of each player in 'society'" << endl;
+				MemOut << PARAM_LIST << endl;
+				MemOut << "# Rows: 'Players'\tColumns: strategies" << endl;
+				MemOut << "#" << endl;
+			}
+		}	
+	}
+
+	// The Single-agent wealth and strategy print file
+	if (singleP){
+		// Single agent wealth
+		SingleW.open(FNSingleW,ios::out|ios::trunc); // Open single agent wealth output file
+		if(SingleW.is_open()){
+			SingleW << HEAD << "Single agent wealth for each time step for all of the 'societies'" << endl;
+			SingleW << PARAM_LIST << endl;
+			SingleW << "# Rows: 'Time steps'\tColumns: individuals/players" << endl;
+			SingleW << "#" << endl;
+		}
+		// Single agent cooperation
+		SingleC.open(FNSingleC,ios::out|ios::trunc); // Open single agent wealth output file
+		if(SingleC.is_open()){
+			SingleC << HEAD << "Single agent cooperation for each time step for all of the 'societies'" << endl;
+			SingleC << PARAM_LIST << endl;
+			SingleC << "# Rows: 'Time steps'\tColumns: individuals/players" << endl;
+			SingleC << "#" << endl;
 		}
 	}
 
@@ -240,21 +272,37 @@ GameTheorySim::~GameTheorySim(){
 	delete[] memory;
 
 
-	// Close the output files 
-	filew.close();
-	filec.close();
-	fileg.close();
-	fileEf.close();
-	filer.close();
-	fileW0.close();
+	// Close the output files
+	if(filew.is_open()){ 
+		filew.close();
+	}
+	if(filec.is_open()){
+		filec.close();
+	}
+	if(fileg.is_open()){
+		fileg.close();
+	}
+	if(fileEf.is_open()){
+		fileEf.close();
+	}
+	if(filer.is_open()){
+		filer.close();
+	}
+	if(fileW0.is_open()){
+		fileW0.close();
+	}
 	if(fileXI.is_open()){
 		fileXI.close();
 	}
 	if(MemOut.is_open()){
 		MemOut.close();
 	}
-
-
+	if(SingleW.is_open()){
+		SingleW.close();
+	}
+	if(SingleC.is_open()){
+		SingleC.close();
+	}
 }
 
 
@@ -264,7 +312,7 @@ GameTheorySim::~GameTheorySim(){
 
 
 // --- Run Full simulation: either SML or NashEQ --- //
-void GameTheorySim::runSimulation_NWA(string type, bool MemTest){
+void GameTheorySim::runSimulation_NWA(string type, bool MemTest, bool singleP){
 
 	// Check which type of simulation I wish to conduct. 	
 	if (type == "SML"){
@@ -272,14 +320,17 @@ void GameTheorySim::runSimulation_NWA(string type, bool MemTest){
 		// Loop over all of the societies
 		for (int scn = 0; scn < NE; scn++){
 
+			// Initialization of the output files //
+			initOutput(this->SimName, this->SML, MemTest, singleP);
+
 			// Print parameters
 			ensemblePrintParams();
 
 			// Initialise society
-			initSociety_SML_NWA(scn, MemTest);
+			initSociety_SML_NWA(scn, MemTest, singleP);
 
 			// Run the simulation for that society
-			runSociety_SML_NWA(scn, MemTest);
+			runSociety_SML_NWA(scn, MemTest, singleP);
 		}
 	}
 	else if (type == "NashEQ"){
@@ -287,14 +338,17 @@ void GameTheorySim::runSimulation_NWA(string type, bool MemTest){
 		// Loop over all of the societies
 		for (int scn = 0; scn < NE; scn++){
 
+			// Initialization of the output files //
+			initOutput(this->SimName, this->SML, MemTest, singleP);
+
 			// Print parameters
 			ensemblePrintParams();
 
 			// Initialise society
-			initSociety_NashEQ_NWA(scn);
+			initSociety_NashEQ_NWA(scn, singleP);
 
 			// Run the simulation for that society
-			runSociety_NashEQ_NWA(scn);
+			runSociety_NashEQ_NWA(scn, singleP);
 		}
 
 	}
@@ -314,7 +368,7 @@ void GameTheorySim::runSimulation_NWA(string type, bool MemTest){
 
 
 // --- The society initialization method for simple memory learning (SML) schmea --- //
-void GameTheorySim::initSociety_SML_NWA(int k, bool MemTest){
+void GameTheorySim::initSociety_SML_NWA(int k, bool MemTest, bool singleP){
 
 	// Print for testing
 	cout << "Initialising SML society nr " << k << endl;
@@ -403,7 +457,7 @@ void GameTheorySim::initSociety_SML_NWA(int k, bool MemTest){
 	}
 	// ------------------------------------- //
 
-	
+
 	
 	// Print the initial state // 
 	// First column: Time Step = 0, Following Columns: 
@@ -413,7 +467,19 @@ void GameTheorySim::initSociety_SML_NWA(int k, bool MemTest){
 	// fileg/GiniCoef.txt --> Gini coef. for each 'society' 
 	//ensemblePrint(filet, filew, filec, fileg, t, eff, wealth, w, alpha, cons, N, NE);
 	ensemblePrint();
-	
+
+
+	// Single-agent print // 
+	if (singleP){
+		SingleW << "#" << endl;
+		SingleW << "#	Society nr. " << k <<  endl;
+		SingleW << "#" << endl;
+		SingleC << "#" << endl;
+		SingleC << "#	Society nr. " << k <<  endl;
+		SingleC << "#" << endl;
+
+		singlePrint();
+	}	
 	
 	// Print for testing
 	cout << "Initialisation of SML society nr " << k << " complete" << endl;
@@ -423,7 +489,7 @@ void GameTheorySim::initSociety_SML_NWA(int k, bool MemTest){
 
 
 // --- The society initialization method for Nash Equalibrium schmea --- //
-void GameTheorySim::initSociety_NashEQ_NWA(int k){
+void GameTheorySim::initSociety_NashEQ_NWA(int k, bool singleP){
 
 	// Print for testing
 	cout << "Initialising NashEQ society nr " << k << endl;
@@ -496,6 +562,17 @@ void GameTheorySim::initSociety_NashEQ_NWA(int k){
 	//ensemblePrint(filet, filew, filec, fileg, t, eff, wealth, w, alpha, cons, N, NE);
 	ensemblePrint();
 	
+	// Single-agent print // 
+	if (singleP){
+		SingleW << "#" << endl;
+		SingleW << "#	Society nr. " << k <<  endl;
+		SingleW << "#" << endl;
+		SingleC << "#" << endl;
+		SingleC << "#	Society nr. " << k <<  endl;
+		SingleC << "#" << endl;
+
+		singlePrint();
+	}
 	
 	// Print for testing
 	cout << "Initialisation of NashEQ society nr " << k << " complete" << endl;
@@ -512,7 +589,7 @@ void GameTheorySim::initSociety_NashEQ_NWA(int k){
 
 
 // --- Run simulation for one full society for SML -- //
-void GameTheorySim::runSociety_SML_NWA(int k, bool MemTest){
+void GameTheorySim::runSociety_SML_NWA(int k, bool MemTest, bool singleP){
 
 
 	// ************************************************************* //
@@ -598,6 +675,11 @@ void GameTheorySim::runSociety_SML_NWA(int k, bool MemTest){
 		// fileg/GiniCoef.txt --> Gini coef. for each 'society' 
 		//ensemblePrint(filet, filew, filec, fileg, t, eff, wealth, w, alpha, cons, N, NE);
 		ensemblePrint();
+
+		// Single-agent print // 
+		if (singleP){
+			singlePrint();
+		}
 			
 
 
@@ -631,7 +713,7 @@ void GameTheorySim::runSociety_SML_NWA(int k, bool MemTest){
 
 
 // --- Run simulation for one full society for NashEQ -- //
-void GameTheorySim::runSociety_NashEQ_NWA(int k){
+void GameTheorySim::runSociety_NashEQ_NWA(int k, bool singleP){
 
 	// ************************************************************* //
 	// ********************* THE BIG TIME LOOP ********************* //		
@@ -692,6 +774,10 @@ void GameTheorySim::runSociety_NashEQ_NWA(int k){
 		//ensemblePrint(filet, filew, filec, fileg, t, eff, wealth, w, alpha, cons, N, NE);
 		ensemblePrint();
 			
+		// Single-agent print // 
+		if (singleP){
+			singlePrint();
+		}
 
 
 		// Print the time to commandline for checking the runtime //
@@ -727,6 +813,14 @@ void GameTheorySim::runSociety_NashEQ_NWA(int k){
 // ----------------------------------------------- //
 // ----- The main methods for the simulation ----- //
 // ----------------------------------------------- //
+
+// --- The payoff function -->> calculates the payoff --- //
+
+double GameTheorySim::payoff(double w, double w0, double alpha, double gain){
+
+	return (w - w0*alpha + gain);
+
+}
 
 // --- makeorder_NWA -->> No wealth accumulation --- //
 
@@ -833,7 +927,8 @@ void GameTheorySim::formgroups_NWA(double *w, double *alpha, double *O, int *ran
 		
 		for(j=0; j<S;j++){
 			// !!!!! THIS IS DIFFERENT THEN THE USUAL CASE !!!!!! //
-			w[rank[k]] = w[rank[k]] - w0[rank[k]]*alpha[rank[k]] + gain; //Here I update the wealth of all the players
+			w[rank[k]] = payoff(w[rank[k]], w0[rank[k]], alpha[rank[k]], gain);
+			//w[rank[k]] = w[rank[k]] - w0[rank[k]]*alpha[rank[k]] + gain; //Here I update the wealth of all the players
 			//cout << "Testing formgroups. Wealth of agent " << rank[k] << " is " << w[rank[k]] <<endl; 
 			k++; //Here I update k so that it keeps track for the next round
 		}
@@ -841,39 +936,6 @@ void GameTheorySim::formgroups_NWA(double *w, double *alpha, double *O, int *ran
 	}
 	return;
 }
-
-/*
-// --- formgroups_NLP_NWA -->> No wealth accumulation && Non-linear payoff --- //
-
-void GameTheorySim::formgroups_NLP_NWA(double *w, double *alpha, double *O, int *rank){
-
-	// i and j are dummy variables, k needs to be updated by hand and will be used for the rank
-	int i,j,k; 
-	double gain; // The gain in the group
-
-	//cout << "Testing formgroups_NWA: M = " << M << endl;
-	k=0; // Initialize k to zero
-	for(i=0;i<M;i++){ // Here i sum over all the groups
-		
-		gain=0; // Set the gain of the group to 0.
-		
-		for(j=0;j<S;j++){
-			gain = gain + O[rank[k+j]]; //Here I am adding to the common pool the contribution due to rank[k]+j
-		}
-		
-		gain = gain*Q; // Correct for the return rate
-		
-		for(j=0; j<S;j++){
-			// !!!!! THIS IS DIFFERENT THEN THE USUAL CASE !!!!!! //
-			w[rank[k]] = w[rank[k]] - w0[rank[k]]*alpha[rank[k]]*alpha[rank[k]] + gain; //Here I update the wealth of all the players with NON-LINEAR PAYOFF!
-			//cout << "Testing formgroups. Wealth of agent " << rank[k] << " is " << w[rank[k]] <<endl; 
-			k++; //Here I update k so that it keeps track for the next round
-		}
-		
-	}
-	return;
-}
-*/
 
 
 
@@ -900,44 +962,12 @@ double GameTheorySim::getutility_NWA(int q, double *w, double *alpha, double *O,
 		
 	gain = gain*Q; //Correct for the return rate
 		
-        utility = w[q] -w0[q]*alpha[q] + gain; //This is the utility 
+	utility = payoff(w[q], w0[q], alpha[q], gain);
+        //utility = w[q] -w0[q]*alpha[q] + gain; //This is the utility 
 	//cout << "Testing getutility! Utility of agent " << q << " is " << utility << endl;	
 	
 	return utility;
 }
-
-/*
-// --- getutility_NLP_NWA -->> No wealth accumulation && Non-linear payoff --- //
-
-double GameTheorySim::getutility_NLP_NWA(int q, double *w, double *alpha, double *O, int *rank){
-	int j,k; //i and j are dummy variables, k needs to be updated by hand and will be used for the rank
-	double gain, utility; //The gain in the group and the utlity of q
-        int g; //The group in which q is
-        int place; //The rank of q
-        
-        // As first thing we have to compute what is the ranking of //
-        place=inverserank(q,rank);
-        // As second thing we have to compute in which group the q-th agent is ending up //
-        g = place/S;
-        
-        // Then I skip directly to that group and compute the gain in that group //
-        k=S * g; //I start from the k-th ranked agent
-        gain=0; //Set the gain of the group to 0.
-	
-        for(j=0;j<S;j++){
-            gain = gain + O[rank[k+j]]; //Here I am adding to the common pool the contribution due to rank[k+j]. Due to how the systyem is designed, one of those people is q
-	}
-		
-	gain = gain*Q; //Correct for the return rate
-		
-        utility = w[q] -w0[q]*alpha[q]*alpha[q] + gain; //This is the utility with NON-LINEAR PAYOFF!
-	//cout << "Testing getutility! Utility of agent " << q << " is " << utility << endl;	
-	
-	return utility;
-}
-
-
-*/
 
 
 // --- newStrategyNashEQ_NWA -->> Nash Equlibrium updating && No Wealth Accumulation--- // 
@@ -978,7 +1008,8 @@ double GameTheorySim::NewStrategyNashEQ_NWA(int k){
 
 	place=inverserank(k,dummyrank); //The position where k is placed
         if(place==oldplace){ //If the rank of k is the same, I don't have to reform the groups. I just update the utility
-            utility=oldutility + alpha_interval * w0[k] * (Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number
+		utility = oldutility + payoff(0, w0[k], alpha_interval, alpha_interval*w0[k]*Q*r[k]);
+            //utility=oldutility + alpha_interval * w0[k] * (Q * r[k] -1); //It's fine because for i=0, I'm sure that this if will never take place because oldplace is initialized to a negative number
         }
         else{ //In this other case I actually have to reform the group
             utility=getutility_NWA(k, w, dummyalpha, dummyO, dummyrank); //Actually form the group and compute the utility
@@ -1111,8 +1142,7 @@ void GameTheorySim::memoryUpdate_NWA(){
 	int oldplace=-1;		//Dummy vector to store the old ranking (to check if the ranking changes or not according to the new strategy). Initialize to a negative
 	int place;			//To store the ranking of the k-th agent
 	double utility, oldutility;	//they contain the possible utility for player k for a strategy and the previous one
-	int old_k=0; 			// Dummy indext for the 'old' utility stuff ... 
-
+	
 	// -- The cut-off cap for the memory values -- //
 	double CO_up = pow(10, 10);
 	double CO_low = pow(10, -10);
@@ -1134,66 +1164,62 @@ void GameTheorySim::memoryUpdate_NWA(){
 			// Find the current memory value
 			float tmp_mem = memory[ID];
 
-			// --- CHECK IF THE MEMORY ENTRY IS WITH-IN THE CUT-OFF BOUNDS--- //
+
+			// -- Play the game for the k-th strategy -- //
+
+			// Set the strategy of k
+			dummyalpha[k]  = i*alpha_interval;
+
+			// Make the rankings 
+			//makeorder(r,OLDw,dummyalpha,dummyrank,cons,dummyO);
+			// !!! This is where NO_WEALTH_ACCUMULATION is hidden !!! //
+			//makeorder_NWA(r, W0, alpha, rank, cons, O); 
+			makeorder_NWA(dummyalpha, dummyrank, dummyO);
+
+			// The position where k is placed	
+			place=inverserank(k,dummyrank);			
+	
+			// Calculate the utility for the k-th player //
+			if(!(place==oldplace)){ 
+
+				// Form the group and compute the utility
+    				utility=getutility_NWA(k, OLDw, dummyalpha, dummyO, dummyrank); 
+			}
+			// If the rank of k is the same, I don't have to reform the groups. I just update the utility
+	        	else{ 
+				// Using the (k - old_k) is umportant, because due to the if statement about the memory not going 
+				// above the cut-off cap, we might skip some of the strategies and k-old_k might not be 1. 
+				utility=oldutility + payoff(0, w0[k], alpha_interval, alpha_interval*w0[k]*Q*r[k]);
+	        	     //utility=oldutility + alpha_interval * w0[k] * (Q * r[k] -1);
+			}
 
 
-			//if (tmp_mem < CO_up && tmp_mem > CO_low){
 
-				// -- Play the game for the k-th strategy -- //
-
-				// Set the strategy of k
-				dummyalpha[k]  = i*alpha_interval;
-
-				// Make the rankings 
-				//makeorder(r,OLDw,dummyalpha,dummyrank,cons,dummyO);
-				// !!! This is where NO_WEALTH_ACCUMULATION is hidden !!! //
-				//makeorder_NWA(r, W0, alpha, rank, cons, O); 
-				makeorder_NWA(dummyalpha, dummyrank, dummyO);
-
-				// The position where k is placed	
-				place=inverserank(k,dummyrank);			
+			// -- Now that I have the utility I can update the memory -- //
 		
-				// Calculate the utility for the k-th player //
-				if(!(place==oldplace)){ 
-
-					// Form the group and compute the utility
-            				utility=getutility_NWA(k, OLDw, dummyalpha, dummyO, dummyrank); 
-        			}
-				// If the rank of k is the same, I don't have to reform the groups. I just update the utility
-		        	else{ 
-					// Using the (k - old_k) is umportant, because due to the if statement about the memory not going 
-					// above the cut-off cap, we might skip some of the strategies and k-old_k might not be 1. 
-		        	     utility=oldutility + alpha_interval * w0[k] * (Q * r[k] -1);
-        			}
+			// Calculate the growth for the k-th agent
+			//double tmp_growth = utility/OLDw[k];
+			double tmp_growth = (utility - OLDw[k])/(w0[k]);
 
 
+			// Calculate the new memory
+			double tmp_new_value = tmp_mem*(1.0 + xi[k]*tmp_growth);
+			bool HIGH = (tmp_new_value > CO_up);
+			bool LOW = (tmp_new_value < CO_low);
+			if ( !HIGH && !LOW  ){
+				memory[ID] = tmp_new_value;
+			}
+			else if (HIGH){
+				memory[ID] = CO_up;
+			}
+			else{
+				memory[ID] = CO_low;
+			}
 
-				// -- Now that I have the utility I can update the memory -- //
-			
-				// Calculate the growth for the k-th agent
-				//double tmp_growth = utility/OLDw[k];
-				double tmp_growth = (utility - OLDw[k])/(w0[k]);
-
-
-				// Calculate the new memory
-				double tmp_new_value = tmp_mem*(1.0 + xi[k]*tmp_growth);
-				bool HIGH = (tmp_new_value > CO_up);
-				bool LOW = (tmp_new_value < CO_low);
-				if ( !HIGH && !LOW  ){
-					memory[ID] = tmp_new_value;
-				}
-				else if (HIGH){
-					memory[ID] = CO_up;
-				}
-				else{
-					memory[ID] = CO_low;
-				}
-
-				// -- Save the oldutility, old_k and oldplace parameters -- //	
-				oldutility=utility;
-				oldplace=place;
-				//old_k = k;
-			//}
+			// -- Save the oldutility, old_k and oldplace parameters -- //	
+			oldutility=utility;
+			oldplace=place;
+	
 		}
 
 
@@ -1356,6 +1382,23 @@ void GameTheorySim::ensemblePrint(){
 	filec  << left << setw(12) << Coop << "\t";
 	fileg  << left << setw(12) << Gini << "\t";
 	fileEf  << left << setw(12) << eff << "\t";
+
+	// End the print function
+	return;
+}
+
+
+// --- Single print -->> The single-agent output --- //
+void GameTheorySim::singlePrint(){
+
+
+	// Printing //
+	for (int i=0; i<N; i++){
+		SingleW  << left << setw(12) << w[i] << "\t";
+		SingleC  << left << setw(12) << alpha[i] << "\t";
+	}
+	SingleW << endl;
+	SingleC << endl;
 
 	// End the print function
 	return;

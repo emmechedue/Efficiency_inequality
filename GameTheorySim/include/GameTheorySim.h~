@@ -66,33 +66,44 @@ class GameTheorySim {
     	GameTheorySim& operator=(const GameTheorySim&) = delete; 
 
 	// --- Constructor and destructor --- //
-	GameTheorySim(string SimName, bool SML);	// IF SML == TRUE -->> Simple memory learning simulation ELSE Nash eq.
+	GameTheorySim(string SimName, bool ifSML);	// IF SML == TRUE -->> Simple memory learning simulation ELSE Nash eq.
 	//GameTheorySim();	
 	~GameTheorySim();
 
+	// Initialization of the output files //
+	virtual void initOutput(string SimName, bool SML, bool memTest, bool singleP);
+
 	// The society initialization method for simple memory learning (SML) schmea //
-	void initSociety_SML_NWA(int k, bool MemTest);
+	virtual void initSociety_SML_NWA(int k, bool MemTest, bool singleP);
 
 	// The society initialization method for Nash Equlibrium schmea //
-	void initSociety_NashEQ_NWA(int k);
+	virtual void initSociety_NashEQ_NWA(int k, bool singleP);
 
 	// Run simulation for one full society for SML //
-	void runSociety_SML_NWA(int k, bool MemTest);
+	virtual void runSociety_SML_NWA(int k, bool MemTest, bool singleP);
 
 	// Run simulation for one full society for NashEQ //
-	void runSociety_NashEQ_NWA(int k);
+	virtual void runSociety_NashEQ_NWA(int k, bool singleP);
 
 	// Run Full simulation: either SML or NashEQ //
-	void runSimulation_NWA(string type, bool MemTest);
+	virtual void runSimulation_NWA(string type, bool MemTest, bool singleP);
 
 
 
 
-	private:
+	//private:
+
+	//protected:
 	
 	// ----------------------------------------------------- //
 	// ----- The fields and varibles of the simulation ----- // 
 	// ----------------------------------------------------- //
+
+	// Type: a bolean name SML 
+	bool SML;
+
+	// Simulation name
+	string SimName;	
 
 	// RNG Stuff 	
 	gsl_rng *gslpointer; 	// Pointer to the type of rng
@@ -168,6 +179,8 @@ class GameTheorySim {
 	ofstream fileg;		// Gini coef. output stream
 	ofstream fileEf;	// Efficientcy output stream
 	ofstream MemOut;	// Memory testing output stream
+	ofstream SingleW;	// Single agent wealth output stream
+	ofstream SingleC;	// Single agent cooperation/strategy output stream
 
 	const string filenamep = string ("parameters.txt");		// File to hold the simulation input parameters	
 	const string filenamew = string ("wealth.txt"); 		// File to hold the total wealth for each ensemble for each timestep
@@ -178,6 +191,8 @@ class GameTheorySim {
 	const string filenameg = string ("giniCoef.txt");		// File to hold the Gini coef. for each society on each time step.
 	const string filenameEf = string ("efficiency.txt");		// File to hold the efficientcy for each society on each time step.
 	const string FNMemOut = string ("memory_test.txt");		// File to hold the memory testing output at each timestep.
+	const string FNSingleW = string ("singleAgent_Wealth.txt");	// File to hold the single agent wealth output for each timestep
+	const string FNSingleC = string ("singleAgent_Cooperation.txt");// File to hold the single agent cooperation output for each timestep
 	
 
 
@@ -189,25 +204,29 @@ class GameTheorySim {
 	
 	// - Only NO Wealth Accumulation (NWA) methods at the moment - //
 
+
+	// The payoff function -->> calculates the payoff //
+	virtual double payoff(double w, double w0, double alpha, double gain);
+
 	// The makeorder mehtod, which ALSO fills the OUTPUT array //
-	void makeorder_NWA(double *alpha, int *rank, double *O);		
+	virtual void makeorder_NWA(double *alpha, int *rank, double *O);		
 
 	// The GROUPING methods, which ALSO claculate the UTILITY //
-	void formgroups_NWA(double *w, double *alpha, double *O, int *rank);	
-	void formgroups_NLP_NWA(double *w, double *alpha, double *O, int *rank);		// Non-linear payoff schema
+	virtual void formgroups_NWA(double *w, double *alpha, double *O, int *rank);	
+	//void formgroups_NLP_NWA(double *w, double *alpha, double *O, int *rank);		// Non-linear payoff schema
 
 	// Methods for calculating the utility of q-th agent without forming groups //
-	double getutility_NWA(int q, double *w, double *alpha, double *O, int *rank);
-	double getutility_NLP_NWA(int q, double *w, double *alpha, double *O, int *rank);	// Non-linear payoff schema	
+	virtual double getutility_NWA(int q, double *w, double *alpha, double *O, int *rank);
+	//double getutility_NLP_NWA(int q, double *w, double *alpha, double *O, int *rank);	// Non-linear payoff schema	
 
 
 	// Methods for gettign a new strategy for the k-th player //
-	double NewStrategyNashEQ_NWA(int k);						// Nash equlibrium
-	double NewStrategyNashEQ_NWA(int k);						// Nash equlibrium
-	double newStrategySML_NWA(int k); 						// Simple learning schema 
+	virtual double NewStrategyNashEQ_NWA(int k);						// Nash equlibrium
+	//double NewStrategyNashEQ_NWA(int k);						// Nash equlibrium
+	virtual double newStrategySML_NWA(int k); 						// Simple learning schema 
 
 	// Memory update methods for the simple learning schema //
-	void memoryUpdate_NWA(); 
+	virtual void memoryUpdate_NWA(); 
 
 
 	
@@ -215,41 +234,44 @@ class GameTheorySim {
 	// --- Support functions --- //
 
 	// --- Binary search --- //
-	int binaryprobsearch(double *Gamma, int M, double x);
+	virtual int binaryprobsearch(double *Gamma, int M, double x);
 
 	// Method to return the rank of the agent k. It's the inverse of rank //
-	int inverserank(int k, int *rank);
+	virtual int inverserank(int k, int *rank);
 
 	// Method for computing the Gini Coef. as defined in Wikipedia //
-	double computegini(double *w);
+	virtual double computegini(double *w);
 
 	// Method for summing over vector of length n //
-	double sumofvector(double *a, int n);
+	virtual double sumofvector(double *a, int n);
 
 	// Method for calculating exponential function using Boost Multiprecision lib
-	myMP_float my_mpEXP(double x);
+	virtual myMP_float my_mpEXP(double x);
 
 
 
 	// --- Printing/Outputting functions --- //
 
-	// Ensemble print -->> The standart output //
-	void ensemblePrint();
+	// Ensemble print -->> The standard output //
+	virtual void ensemblePrint();
+
+	// Single print -->> Output the single print //
+	virtual void singlePrint();
 
 	// ensemblePrintParams -->> prints the parameters.txt file //
-	void ensemblePrintParams();
+	virtual void ensemblePrintParams();
 
 	// ensemblePrintTalent -->> Prints the INVESTMENT TALENT to the talent.txt file //
-	void ensemblePrintTalent();
+	virtual void ensemblePrintTalent();
 
 	// ensemblePrintW0 -->> Prints the INVESTMENT CAP to the investment_cap.txt file //
-	void ensemblePrintW0();
+	virtual void ensemblePrintW0();
 
 	// ensemblePrintXI -->> Prints the LEARNING SKILL/TALENT to the learning_skill.txt file //
-	void ensemblePrintXI();
+	virtual void ensemblePrintXI();
 
 	// printMemory -->> Prints the memory of the learning schema || for testing purposes -->> have to give a opened ofstream //
-	void printMemory(int t);
+	virtual void printMemory(int t);
 
 
 

@@ -6,6 +6,7 @@
  */
 
 #include "GameTheorySim.h"
+#include "GTS_quadPayoff.h"
 #include "readcmd.h"
 
 
@@ -19,6 +20,15 @@ int main (int argc, char* argv[]){
 	string simName("GameTheorySim");
 	int control=1;
 	bool MemTest = false;
+	bool singlePrint = false;
+	bool quad = false;
+
+	// Check which kind of payoff I wish to use //
+		if(cmdOptionExists(argv, argv+argc, "-Q"))
+	{
+		quad=true;
+	
+	}
 
 	// Check which kind of simulation I wish to conduct //
 	if(cmdOptionExists(argv, argv+argc, "-SML"))
@@ -44,6 +54,13 @@ int main (int argc, char* argv[]){
 		exit(1);
 	}
 
+	// Check if to print single agent data or not //
+	if(cmdOptionExists(argv, argv+argc, "-SA"))
+	{
+		singlePrint=true;
+	
+	}
+
 	// Can change the simulation name with commandline parameters if I wish //
 	if(cmdOptionExists(argv, argv+argc, "-N"))
 	{
@@ -52,11 +69,18 @@ int main (int argc, char* argv[]){
 	}
 
 
+	// Run the simulation //
 	if (control > 0){
 	
-		GameTheorySim myGTsim (simName, SML);
-		myGTsim.runSimulation_NWA(simType, MemTest);
-	
+		if(!quad){
+			GameTheorySim myGTsim (simName, SML);
+			myGTsim.runSimulation_NWA(simType, MemTest, singlePrint);
+		}
+		else if(quad){
+			GTS_quadPayoff myGTsim (simName, SML);
+			myGTsim.runSimulation_NWA(simType, MemTest, singlePrint);
+		}	
+
 	}
 
 }
